@@ -86,6 +86,7 @@ class PatientServeice implements PatienInterface
             array_push($weeks, $week->format("Y-m-d"));
             $firstWeek->modify('+1 week');
         }
+        // dd($weeks);
 
         $appointments = $doctor->appointments->whereIn('date', $weeks);
         // currentWeek
@@ -93,6 +94,9 @@ class PatientServeice implements PatienInterface
         $appointments = $appointments->concat($currentWeekAppointments)->sortByDesc('created_at');
 
         return $appointments;
+    }
+    public function allArchive($doctor, $current) {
+        $currentWeek = date_create($current);
     }
     public function cancel($appointment, $canceldBy)
     {

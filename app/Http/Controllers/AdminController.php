@@ -10,12 +10,22 @@ use App\Models\User;
 use App\Models\TimeTable;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use App\Interfaces\PatienInterface;
+use App\Models\Appointment;
+use Carbon\Carbon;
+
+
 
 class AdminController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+    protected $patienService;
+    public function __construct(PatienInterface $patienService)
+    {
+        $this->patienService = $patienService;
+    }
     public function index()
     {
         // $this->setDate();
@@ -133,7 +143,7 @@ class AdminController extends Controller
             }
 
             $photo =  Storage::disk('doctors')->put('/', $request->file('profile'));
-            $doctor->profile=$photo;
+            $doctor->profile = $photo;
         }
         $user = User::findOrFail($doctor->user_id);
         $user->name = $request->name;
@@ -141,7 +151,7 @@ class AdminController extends Controller
         if ($user->email != $request->email) {
             $email = User::where('email', $request->email)->exists();
             if ($email) {
-               
+
                 return back()->withErrors(['email' => 'Email already exists!']);
             }
             $user->email = $request->email;
@@ -153,12 +163,12 @@ class AdminController extends Controller
         }
         $user->save();
 
-            $doctor->specialty = $request->specialty;
-            $doctor->experiance = $request->experiance;
-            $doctor->phone = $request->phone;
-            $doctor->clinic_id = $request->clinic_id;
-           
-           $doctor->save();
+        $doctor->specialty = $request->specialty;
+        $doctor->experiance = $request->experiance;
+        $doctor->phone = $request->phone;
+        $doctor->clinic_id = $request->clinic_id;
+
+        $doctor->save();
 
         return redirect()->back()->with('success', 'Doctor Updated successfully!');
     }
@@ -240,5 +250,41 @@ class AdminController extends Controller
     {
         $doctors = Doctor::with('clinic', 'user')->get(); // Eager load relationships
         return response()->json($doctors);
+    }
+    //view old appointments
+    public function archive($id, $current = null)
+    {
+        $doctor = Doctor::findOrFail($id);
+        $days = GetDaysNames(TimesWhereNotNull($doctor));
+        if ($current == null) {
+            $current = GetCurrentDay($days);
+        }
+        $appointments = $this->patienService->archive($doctor, $current);
+        return view('admin.doctors.archive', compact('doctor', 'appointments', 'days', 'current'));
+    }
+     // show appointment
+     public function appointment($id,$from=null)  {
+        
+        $appointment = Appointment::findOrFail($id);
+        $times = TimesWhereNotNull($appointment->doctor);
+
+
+        $AllDays = ['sat' => 'Saturday', 'sun' => 'Sunday', 'mon' => 'Monday', 'tue' => 'Tuesday', 'wed' => 'Wednesday', 'thurs' => 'Thursday', 'fri' => 'Friday'];
+        $days = [];
+        foreach ($times as $key => $date) {
+            $times[$key] = Carbon::createFromFormat('H:i:s', $date)->format('h:i A');
+        }
+
+        foreach ($times as $key => $val) {
+            $subString = substr($key, 0, 3); //sun
+            if ($subString == 'thu') {
+                $subString = "thurs";
+            }
+
+            if (!array_key_exists($subString, $days)) {
+                $days[$subString] = $AllDays[$subString];
+            }
+        }
+        return view('admin.doctors.showAppointment',compact('appointment','times', 'days','from'));
     }
 }

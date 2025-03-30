@@ -16,7 +16,7 @@ class Hospital extends Model
         'phone2',
         'hotline',
         'email',
-        'salary',
+        'balance',
     ];
     protected $hidden =[
         'id',

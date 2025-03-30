@@ -16,9 +16,6 @@ class HospitalController extends Controller
         $hospital = Hospital::first();
         return view('admin.hospital', ['hospital' => $hospital]);
     }
-
-
-
     public function update(Request $request)
     {
 
@@ -86,4 +83,6 @@ class HospitalController extends Controller
             abort(404);
         }
     }
+    // balance
+    
 }

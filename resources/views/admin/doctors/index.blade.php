@@ -36,6 +36,7 @@
                     <th scope="col">Salary</th>
                     <th scope="col">Edit</th>
                     <th scope="col">Time Table</th>
+                    <th scope="col">Archive</th>
                     <th scope="col">Delete</th>
                 </tr>
             </thead>
@@ -58,6 +59,8 @@
                                 class="btn btn-primary">Edit</a> </td>
                         <td style="align-content: center;"> <a href="{{ route('doctors.timeTable', $doctor->id) }}"
                                 class="btn btn-success">TimeTable</a> </td>
+                        <td style="align-content: center;"> <a href="{{route('doctors.archive',$doctor->id)}}"
+                                class="btn btn-dark">Archive</a> </td>
                         <td style="align-content: center;">
                             <form action="{{ route('doctors.destroy', $doctor->id) }}" method="post"
                                 onsubmit="return confirmDelete()">
@@ -127,6 +130,8 @@
                         <td>${doctor.salary}</td>
                         <td><a href="/doctors/${doctor.id}/edit" class="btn btn-primary">Edit</a></td>
                         <td><a href="/doctors/${doctor.id}/timetable" class="btn btn-success">TimeTable</a></td>
+                          <td style="align-content: center;"> <a href="/doctors/archive/${doctor.id}"
+                                class="btn btn-dark">Archive</a> </td>
                         <td>
                             <form action="/doctors/${doctor.id}" method="post" onsubmit="return confirmDelete()">
                                 @csrf
