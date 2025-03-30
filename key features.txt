@@ -1,0 +1,11 @@
+Key Featured
+
+* Dependency Injection
+* Dependency Inversion
+* Authorization
+* WebSocket
+* Payment Gateway
+* DB transaction
+* pdf export
+* balance repots
+* api if needed
