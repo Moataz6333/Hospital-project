@@ -25,14 +25,14 @@
                     @error('name')
                         <p class="text-danger "><small>{{ $message }}</small> </p>
                     @enderror
-                    <input type="text" name="name" class="form-control" required placeholder="Patien FName LName ." value="{{ old('name') }}">
+                    <input type="text" name="name" class="form-control" required placeholder="patient FName LName ." value="{{ old('name') }}">
                 </div>
                 <div class="col">
                     <label for="phone" class="form-label">Phone</label>
                     @error('phone')
                         <p class="text-danger "><small>{{ $message }}</small> </p>
                     @enderror
-                    <input type="text" class="form-control" name="phone" placeholder="Patien phone ..." value="{{ old('phone') }}">
+                    <input type="text" class="form-control" name="phone" placeholder="patient phone ..." value="{{ old('phone') }}">
                 </div>
     
             </div>

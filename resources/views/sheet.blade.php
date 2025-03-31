@@ -77,13 +77,13 @@
             <div>
                 <h4>Patient Name :</h4>
                 <p class="p-text">
-                    {{$transaction->patien->name}}
+                    {{$transaction->patient->name}}
                 </p>
             </div>
             <div>
                 <h4>Patient Phone :</h4>
                 <p class="p-text">
-                    {{$transaction->patien->phone}}
+                    {{$transaction->patient->phone}}
                 </p>
             </div>
         </div>

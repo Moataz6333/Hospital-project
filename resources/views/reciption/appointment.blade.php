@@ -9,7 +9,7 @@
         {{ route('reception.appointments', ['id' => $appointment->doctor->id, 'day' => GetCurrentDayForDoctor($appointment->doctor)]) }} @endif 
         "
                 class="btn btn-dark"><span data-feather="arrow-left"></span></a>
-            Appointment for <u>{{ $appointment->patien->name }}</u>
+            Appointment for <u>{{ $appointment->patient->name }}</u>
             @if ($appointment->transaction)
                 <a target="_blank" href="{{ route('hospital.sheet', $appointment->transaction->PaymentId) }}"
                     class="btn btn-info ml-3">Invoice</a>
@@ -38,16 +38,16 @@
                     @error('name')
                         <p class="text-danger "><small>{{ $message }}</small> </p>
                     @enderror
-                    <input type="text" name="name" class="form-control" required placeholder="Patien Name..."
-                        value="{{ $appointment->patien->name }}">
+                    <input type="text" name="name" class="form-control" required placeholder="patient Name..."
+                        value="{{ $appointment->patient->name }}">
                 </div>
                 <div class="col">
                     <label for="phone" class="form-label">Phone</label>
                     @error('phone')
                         <p class="text-danger "><small>{{ $message }}</small> </p>
                     @enderror
-                    <input type="text" class="form-control" name="phone" placeholder="Patien phone ..."
-                        value="{{ $appointment->patien->phone }}">
+                    <input type="text" class="form-control" name="phone" placeholder="patient phone ..."
+                        value="{{ $appointment->patient->phone }}">
                 </div>
 
             </div>

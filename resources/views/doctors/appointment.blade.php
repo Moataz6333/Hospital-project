@@ -9,7 +9,7 @@
         {{ route('doctor.index', ['day' => GetCurrentDayForDoctor($appointment->doctor)]) }} @endif 
         "
                 class="btn btn-dark"><span data-feather="arrow-left"></span></a>
-            Appointment for <u>{{ $appointment->patien->name }}</u>
+            Appointment for <u>{{ $appointment->patient->name }}</u>
         </h2>
         <hr>
 
@@ -30,11 +30,11 @@
                 <div class="row my-3 flex-column flex-md-row">
                     <div class="col d-flex gap-2 align-items-end">
                         <h5 class="card-title m-0 font-weight-600">Name : </h5>
-                        <p class="card-text" style="font-size: 1rem;">{{ $appointment->patien->name }} </p>
+                        <p class="card-text" style="font-size: 1rem;">{{ $appointment->patient->name }} </p>
                     </div>
                     <div class="col d-flex gap-2 align-items-end ">
                         <h5 class="card-title m-0 font-weight-600">Phone : </h5>
-                        <p class="card-text" style="font-size: 1rem;">{{ $appointment->patien->phone }} </p>
+                        <p class="card-text" style="font-size: 1rem;">{{ $appointment->patient->phone }} </p>
                     </div>
                 </div>
                 <div class="row my-3 flex-column flex-md-row">

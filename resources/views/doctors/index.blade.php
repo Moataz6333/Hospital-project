@@ -47,10 +47,10 @@
                             {{ $i++ }}
                         </th>
                         <td>
-                            {{ $appointment->patien->name }}
+                            {{ $appointment->patient->name }}
                         </td>
                         <td>
-                            {{ $appointment->patien->phone }}
+                            {{ $appointment->patient->phone }}
                         </td>
                         <td>
                             {{ $appointment->type }}
@@ -96,7 +96,7 @@
                 .listen(".new-appointment", (data) => {
                     // console.log("New Appointment Received:", data.appointment);
                     let appointment = data.appointment;
-                    let patient = appointment.patien;
+                    let patient = appointment.patient;
 
                     // Format the status and paid fields
                     let paidClass = appointment.paid ? "text-success" : "text-danger";

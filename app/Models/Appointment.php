@@ -4,13 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Patien;
+use App\Models\Patient;
 
 class Appointment extends Model
 {
     use HasFactory;
     protected $fillable=[
-        'patien_id',
+        'patient_id',
         'doctor_id',
         'date',
         'type',
@@ -22,8 +22,8 @@ class Appointment extends Model
         'canceled_by',
     ];
 
-    public function patien(){
-        return $this->belongsTo(Patien::class,'patien_id','id');
+    public function patient(){
+        return $this->belongsTo(Patient::class,'patient_id','id');
     }
     public function doctor(){
         return $this->belongsTo(Doctor::class);

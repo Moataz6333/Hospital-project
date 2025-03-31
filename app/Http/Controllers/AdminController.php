@@ -10,7 +10,7 @@ use App\Models\User;
 use App\Models\TimeTable;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use App\Interfaces\PatienInterface;
+use App\Interfaces\PatientInterface;
 use App\Models\Appointment;
 use Carbon\Carbon;
 
@@ -21,10 +21,10 @@ class AdminController extends Controller
     /**
      * Display a listing of the resource.
      */
-    protected $patienService;
-    public function __construct(PatienInterface $patienService)
+    protected $patientService;
+    public function __construct(PatientInterface $patientService)
     {
-        $this->patienService = $patienService;
+        $this->patientService = $patientService;
     }
     public function index()
     {
@@ -259,7 +259,7 @@ class AdminController extends Controller
         if ($current == null) {
             $current = GetCurrentDay($days);
         }
-        $appointments = $this->patienService->archive($doctor, $current);
+        $appointments = $this->patientService->archive($doctor, $current);
         return view('admin.doctors.archive', compact('doctor', 'appointments', 'days', 'current'));
     }
      // show appointment

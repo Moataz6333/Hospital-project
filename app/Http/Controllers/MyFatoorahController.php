@@ -122,7 +122,7 @@ class MyFatoorahController extends Controller
                 $appointment->save();
                 // save the Transaction
                 $transaction  = Transaction::create([
-                    'patien_id' => $appointment->patien->id,
+                    'patient_id' => $appointment->patient->id,
                     'appointment_id' => $appointment->id,
                     'InvoiceId' => $data->InvoiceId,
                     'InvoiceReference' => $data->InvoiceReference,
@@ -166,7 +166,7 @@ class MyFatoorahController extends Controller
 
 
             //You can replace this variable with customer Id in your system
-            $customerId = $order['patien_id'];
+            $customerId = $order['patient_id'];
 
             //You can use the user defined field if you want to save card
             $userDefinedField = config('myfatoorah.save_card') && $customerId ? "CK-$customerId" : '';
@@ -270,9 +270,9 @@ class MyFatoorahController extends Controller
     {
         $appointment = Appointment::findOrFail($orderId);
         return [
-            'name' => $appointment->patien->name,
-            'phone' => str_starts_with($appointment->patien->phone, "0") ? ltrim($appointment->patien->phone, '0') : $appointment->patien->phone,
-            'patien_id' => $appointment->patien->id,
+            'name' => $appointment->patient->name,
+            'phone' => str_starts_with($appointment->patient->phone, "0") ? ltrim($appointment->patient->phone, '0') : $appointment->patient->phone,
+            'patient_id' => $appointment->patient->id,
             'total'    => (float) $appointment->doctor->price,
             'currency' => config('app.currency', 'EGP')
         ];

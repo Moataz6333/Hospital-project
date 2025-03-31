@@ -61,11 +61,11 @@
         <div class="row">
             <div class="col">
                 <h4>Patient Name:</h4>
-                <p>{{$transaction->patien->name}}</p>
+                <p>{{$transaction->patient->name}}</p>
             </div>
             <div class="col">
                 <h4>Patient Phone:</h4>
-                <p>{{$transaction->patien->phone}}</p>
+                <p>{{$transaction->patient->phone}}</p>
             </div>
         </div>
 

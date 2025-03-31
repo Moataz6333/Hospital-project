@@ -13,14 +13,14 @@ use App\Models\Hospital;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use App\Interfaces\PatienInterface;
+use App\Interfaces\PatientInterface;
 
 class HospitalController extends Controller
 {
-    protected $patienService;
-    public function __construct(PatienInterface $patienService)
+    protected $patientService;
+    public function __construct(PatientInterface $patientService)
     {
-        $this->patienService = $patienService;
+        $this->patientService = $patientService;
     }
     public function Hospital()
     {
@@ -75,14 +75,14 @@ class HospitalController extends Controller
         $registration_method = 'website';
         if ($request->payment_method == 'cash') {
 
-            $appointment = new AppointmentResource( $this->patienService->register_Cash($validator->validated(), $doctor, $registration_method)) ;
+            $appointment = new AppointmentResource( $this->patientService->register_Cash($validator->validated(), $doctor, $registration_method)) ;
             return response()->json([
                 'message' => "Regestration Done Successfully",
                 'appointment' => $appointment
             ], 200);
         } else {
 
-            $appointment =  $this->patienService->register_Online($validator->validated(), $doctor, $registration_method);
+            $appointment =  $this->patientService->register_Online($validator->validated(), $doctor, $registration_method);
             return response()->json([
                 "message"=>"appointment created",
                 "link"=>env("APP_URL")."/myfatoorah/checkout?oid={$appointment->id}"

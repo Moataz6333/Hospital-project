@@ -2,7 +2,7 @@
 
 namespace App\Interfaces;
 
-interface PatienInterface{
+interface PatientInterface{
     public function register_Cash($data,$doctor,$registration_method);
     public function register_Online($data,$doctor,$registration_method);
     public function updateAppointment($appointment,$data);

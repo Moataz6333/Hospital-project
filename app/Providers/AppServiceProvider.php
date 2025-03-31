@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Interfaces\PatienInterface;
+use App\Interfaces\PatientInterface;
 use App\Services\PatientServeice;
 use Illuminate\Support\ServiceProvider;
 
@@ -15,7 +15,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(PatienInterface::class,function ()  {
+        $this->app->bind(PatientInterface::class,function ()  {
                 return new PatientServeice();
         });
     }

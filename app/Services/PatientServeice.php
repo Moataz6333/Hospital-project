@@ -2,24 +2,24 @@
 
 namespace App\Services;
 
-use App\Interfaces\PatienInterface;
-use App\Models\Patien;
+use App\Interfaces\PatientInterface;
+use App\Models\Patient;
 use App\Models\Appointment;
 use App\Jobs\NewAppointmentJob;
 
-class PatientServeice implements PatienInterface
+class patientServeice implements PatientInterface
 {
     
 
     public function register_Cash($data, $doctor, $registration_method)
     {
 
-        $patien = new Patien();
-        $patien->name = $data['name'];
-        $patien->phone = $data['phone'];
-        $patien->save();
+        $patient = new Patient();
+        $patient->name = $data['name'];
+        $patient->phone = $data['phone'];
+        $patient->save();
         $appointment = new Appointment();
-        $appointment->patien_id = $patien->id;
+        $appointment->patient_id = $patient->id;
         $appointment->doctor_id = $doctor->id;
         $appointment->date = $data['date'];
         $appointment->type = $data['type'];
@@ -35,12 +35,12 @@ class PatientServeice implements PatienInterface
     public function register_Online($data, $doctor, $registration_method)
     {
 
-        $patien = new Patien();
-        $patien->name = $data['name'];
-        $patien->phone = $data['phone'];
-        $patien->save();
+        $patient = new Patient();
+        $patient->name = $data['name'];
+        $patient->phone = $data['phone'];
+        $patient->save();
         $appointment = new Appointment();
-        $appointment->patien_id = $patien->id;
+        $appointment->patient_id = $patient->id;
         $appointment->doctor_id = $doctor->id;
         $appointment->date = $data['date'];
         $appointment->type = $data['type'];
@@ -57,10 +57,10 @@ class PatientServeice implements PatienInterface
     }
     public function updateAppointment($appointment, $data)
     {
-        $patien = $appointment->patien;
-        $patien->name = $data['name'];
-        $patien->phone = $data['phone'];
-        $patien->save();
+        $patient = $appointment->patient;
+        $patient->name = $data['name'];
+        $patient->phone = $data['phone'];
+        $patient->save();
         $appointment->date = $data['date'];
         $appointment->type = $data['type'];
         $appointment->payment_method = $data['payment_method'];
@@ -95,12 +95,10 @@ class PatientServeice implements PatienInterface
 
         return $appointments;
     }
-    public function allArchive($doctor, $current) {
-        $currentWeek = date_create($current);
-    }
+    
     public function cancel($appointment, $canceldBy)
     {
-        if (!in_array($canceldBy, ['doctor', 'patien'])) {
+        if (!in_array($canceldBy, ['doctor', 'patient'])) {
             return redirect()->back()->with('error', 'something went wrong');
         }
         $appointment->status = "canceled";

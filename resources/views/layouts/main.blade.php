@@ -126,13 +126,13 @@
                                     <li class="nav-item ms-2">
                                         <a class="nav-link" href="{{ route('employees.index') }}">
                                             <span data-feather="hash"></span>
-                                            all eployees
+                                            all employees
                                         </a>
                                     </li>
                                     <li class="nav-item ms-2">
                                         <a class="nav-link" href="{{ route('employees.create') }}">
                                             <span data-feather="user-plus"></span>
-                                            add eployee
+                                            add employee
                                         </a>
                                     </li>
                                 </ul>

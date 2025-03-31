@@ -16,8 +16,10 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'Hospital'),
     'currency' => env('APP_CURRENCY', 'EGP'),
+    'rate' => env('MYFATOORAH_EXCHANGE_RATE', 85.33),
+
 
     /*
     |--------------------------------------------------------------------------

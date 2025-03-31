@@ -13,8 +13,5 @@ class PatientController extends Controller
         $this->patientService = $patientService;
     }
     
-    public function index() {
-        ;
-        // return "test" .$this->patientService->register("");
-    }
+    
 }

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Interfaces\PatienInterface;
+use App\Interfaces\PatientInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Doctor;
@@ -15,10 +15,10 @@ use MyFatoorah\Library\MyFatoorah;
 
 class DoctorController extends Controller
 {
-    protected $patienService;
-    public function __construct(PatienInterface $patienService)
+    protected $patientService;
+    public function __construct(PatientInterface $patientService)
     {
-        $this->patienService = $patienService;
+        $this->patientService = $patientService;
     }
     public function index($current = null)
     {
@@ -70,7 +70,7 @@ class DoctorController extends Controller
         if ($current == null) {
             $current = GetCurrentDay($days);
         }
-        $appointments = $this->patienService->archive($doctor, $current);
+        $appointments = $this->patientService->archive($doctor, $current);
         return view('doctors.archive', compact('doctor', 'appointments', 'days', 'current'));
     }
     public function done($id)
@@ -87,7 +87,7 @@ class DoctorController extends Controller
     public function cancel($id)
     {
         $appointment = Appointment::findOrFail($id);
-        $this->patienService->cancel($appointment, 'doctor');
+        $this->patientService->cancel($appointment, 'doctor');
         return redirect()->back()->with('success', 'Appointment canceled successfully!');
     }
    

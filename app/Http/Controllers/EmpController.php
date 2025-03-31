@@ -6,8 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\User;
 use App\Models\Employee;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 
 class EmpController extends Controller
@@ -17,7 +19,7 @@ class EmpController extends Controller
      */
     public function index()
     {
-        return view('employees.index',['employees'=>Employee::all()]);
+        return view('employees.index', ['employees' => Employee::all()]);
     }
 
     /**
@@ -27,7 +29,6 @@ class EmpController extends Controller
     {
 
         return view('employees.create');
-
     }
 
 
@@ -36,52 +37,58 @@ class EmpController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            "name"=>"required|min:2",
-            "email"=>"required|email|unique:users",
-            "role"=>"required|min:4",
-            "password"=>"required|min:6|confirmed",
-            "national_id"=>"required",
-            "address"=>"required",
-            "salary"=>"required",
-            "phone"=>"required",
-            "home_phone"=>"required",
-            "gender"=>"required",
-            "profile" => "image|max:2048|nullable"
-        ]);
 
-        
+        $validator =  Validator::make(
+            $request->all(),
+            [
+                'name' => ['required', 'min:3'],
+                'email' => ['required', 'email', 'unique:users'],
+                'role' => ['required', Rule::in(['admin', 'super_adimn', 'receptionist', 'nurse', 'security'])],
+                'password' => ['required', 'min:6', 'confirmed'],
+                'national_id' => ['required', 'min:5'],
+                'salary' => ['required'],
+                'phone' => ['required'],
+                'home_phone' => ['required'],
+                'gender' => ['required', Rule::in(['male', 'female'])],
+                'profile' => ['image', 'max:2048', 'nullable'],
+            ]
+        );
+        if ($validator->fails()) {
+
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+
         // user 
-        $user= new User();
-        $user->name=$request->name;
-        $user->email=$request->email;
-        $user->role=$request->role;
-        $user->password =Hash::make($request->password);
+        $user = new User();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        if ($request->role == 'super_admin' || $request->role == 'admin') {
+            Gate::authorize('isSuperAdmin');
+        }
+        $user->role = $request->role;
+        $user->password = Hash::make($request->password);
         $user->save();
         // Emp
-        $emp =new Employee();
-        $emp->user_id =$user->id;
-        $emp->phone =$request->phone;
-        $emp->home_phone =$request->home_phone;
-        $emp->gender =$request->gender;
-        $emp->birthDate =$request->birthdate;
-        $emp->salary =(int) $request->salary;
-        $emp->national_id =$request->national_id;
-        $emp->address =$request->address;
+        $emp = new Employee();
+        $emp->user_id = $user->id;
+        $emp->phone = $request->phone;
+        $emp->home_phone = $request->home_phone;
+        $emp->gender = $request->gender;
+        $emp->birthDate = $request->birthdate;
+        $emp->salary = (int) $request->salary;
+        $emp->national_id = $request->national_id;
+        $emp->address = $request->address;
         $emp->save();
-        
-        if($request->hasFile('profile')){
-           
-            $photo=  Storage::disk('employees')->put('/',$request->file('profile'));
-            $emp->profile=$photo;
+
+        if ($request->hasFile('profile')) {
+
+            $photo =  Storage::disk('employees')->put('/', $request->file('profile'));
+            $emp->profile = $photo;
             $emp->save();
-             
-          }
+        }
 
-          return redirect()->back()->with('success','Employee registerd successfully');
-
-
-        
+        return redirect()->back()->with('success', 'Employee registerd successfully');
     }
 
     /**
@@ -89,12 +96,12 @@ class EmpController extends Controller
      */
     public function show(string $id)
     {
-      
+
         $emp = Employee::findOrFail($id);
-        return view('employees.show',['emp'=>$emp]);
+        return view('employees.show', ['emp' => $emp]);
     }
 
-    
+
 
     /**
      * Update the specified resource in storage.
@@ -103,64 +110,59 @@ class EmpController extends Controller
     {
 
         $request->validate([
-            "name"=>"required|min:2",
-            "email"=>"required|email",
-            "role"=>"required|min:4",
-            "password"=>"nullable|min:6|confirmed",
-            "national_id"=>"required",
-            "address"=>"required",
-            "salary"=>"required",
-            "phone"=>"required",
-            "home_phone"=>"required",
-            "gender"=>"required",
+            "name" => "required|min:2",
+            "email" => "required|email",
+            "role" => "required|min:4",
+            "password" => "nullable|min:6|confirmed",
+            "national_id" => "required",
+            "address" => "required",
+            "salary" => "required",
+            "phone" => "required",
+            "home_phone" => "required",
+            "gender" => "required",
             "profile" => "image|max:2048|nullable"
         ]);
 
-        $emp =Employee::findOrFail($id);
+        $emp = Employee::findOrFail($id);
         // user 
-        $user= User::findOrfail($emp->user_id);
-        $user->name=$request->name;
-        if($user->email != $request->email){
-           $email = User::where('email', $request->email)->exists();
-           if($email){
-            return back()->withErrors(['email' => 'Email already exists!']);
-           }
-            $user->email=$request->email;
+        $user = User::findOrfail($emp->user_id);
+        $user->name = $request->name;
+        if ($user->email != $request->email) {
+            $email = User::where('email', $request->email)->exists();
+            if ($email) {
+                return back()->withErrors(['email' => 'Email already exists!']);
+            }
+            $user->email = $request->email;
         }
-        $user->role=$request->role;
+        $user->role = $request->role;
 
-        if($request->password != null){
+        if ($request->password != null) {
 
-            $user->password =Hash::make($request->password);
+            $user->password = Hash::make($request->password);
         }
         $user->save();
         // Emp
-        
-       
-        $emp->phone =$request->phone;
-        $emp->home_phone =$request->home_phone;
-        $emp->gender =$request->gender;
-        $emp->birthDate =$request->birthdate;
-        $emp->salary =(int) $request->salary;
-        $emp->national_id =$request->national_id;
-        $emp->address =$request->address;
+
+
+        $emp->phone = $request->phone;
+        $emp->home_phone = $request->home_phone;
+        $emp->gender = $request->gender;
+        $emp->birthDate = $request->birthdate;
+        $emp->salary = (int) $request->salary;
+        $emp->national_id = $request->national_id;
+        $emp->address = $request->address;
         $emp->save();
-        
-        if($request->hasFile('profile')){
-            if($emp->profile != null){
-                Storage::disk('employees')->delete('/'. $emp->profile);
 
+        if ($request->hasFile('profile')) {
+            if ($emp->profile != null) {
+                Storage::disk('employees')->delete('/' . $emp->profile);
             }
-            $photo=  Storage::disk('employees')->put('/',$request->file('profile'));
-            $emp->profile=$photo;
+            $photo =  Storage::disk('employees')->put('/', $request->file('profile'));
+            $emp->profile = $photo;
             $emp->save();
-             
-          }
+        }
 
-     return redirect()->back()->with('success','Employee Updated successfully');
-
-
-        
+        return redirect()->back()->with('success', 'Employee Updated successfully');
     }
 
     /**
@@ -168,25 +170,23 @@ class EmpController extends Controller
      */
     public function destroy(string $id)
     {
-        $emp=Employee::findOrFail($id);
-        if($emp->profile != null){
-            Storage::disk('employees')->delete('/'. $emp->profile);
-
+        $emp = Employee::findOrFail($id);
+        if ($emp->profile != null) {
+            Storage::disk('employees')->delete('/' . $emp->profile);
         }
-        $user=User::findOrFail($emp->user_id);
+        $user = User::findOrFail($emp->user_id);
         $user->delete();
-        return to_route('employees.index',['employees'=>Employee::all()])->with('success','employee deleted successfully!');
-        
+        return to_route('employees.index', ['employees' => Employee::all()])->with('success', 'employee deleted successfully!');
     }
     public function search(Request $request)
     {
         $request->validate([
             'name' => "required"
         ]);
-    
+
         $users = User::where('name', 'like', '%' . $request->name . '%')->get();
         $employees = [];
-    
+
         foreach ($users as $user) {
             if ($user->employee) {
                 $employees[] = [
@@ -201,15 +201,15 @@ class EmpController extends Controller
                 ];
             }
         }
-    
+
         return response()->json($employees);
     }
-    
+
     public function getAllEmployees()
     {
         $users = User::whereHas('employee')->where('id', '!=', auth()->id())->get();
         $employees = [];
-    
+
         foreach ($users as $user) {
             $employees[] = [
                 'id' => $user->employee->id,
@@ -222,9 +222,7 @@ class EmpController extends Controller
                 ]
             ];
         }
-    
+
         return response()->json($employees);
     }
-    
-    
 }

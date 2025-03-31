@@ -21,7 +21,7 @@ class NewAppointmentEvent implements ShouldBroadcastNow
 
     public function __construct(Appointment $appointment)
     {
-        $this->appointment = $appointment->load('patien');
+        $this->appointment = $appointment->load('patient');
     }
 
    

@@ -9,17 +9,17 @@ use App\Models\Doctor;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use App\Interfaces\PatienInterface;
+use App\Interfaces\PatientInterface;
 
 date_default_timezone_set('Africa/Cairo');
 
 
 class ReciptionController extends Controller
 {
-    protected $patienService;
-    public function __construct(PatienInterface $patienService)
+    protected $patientService;
+    public function __construct(PatientInterface $patientService)
     {
-        $this->patienService = $patienService;
+        $this->patientService = $patientService;
     }
     public function index()
     {
@@ -114,11 +114,11 @@ class ReciptionController extends Controller
         $registration_method = 'reception';
         if($request->payment_method == 'cash'){
 
-            $this->patienService->register_Cash($validator->validated(),$doctor,$registration_method);
+            $this->patientService->register_Cash($validator->validated(),$doctor,$registration_method);
             return redirect()->back()->with('success', 'Appointment registered successfully!');
         }else{
 
-          $appointment=  $this->patienService->register_Online($validator->validated(),$doctor,$registration_method);
+          $appointment=  $this->patientService->register_Online($validator->validated(),$doctor,$registration_method);
             return redirect("myfatoorah/checkout?oid={$appointment->id}");
         }
 
@@ -187,7 +187,7 @@ class ReciptionController extends Controller
         if(substr($request->day,0,3) !== date_format(date_create($request->date),'D')){
             return redirect()->back()->withErrors(['date'=>'date must match day'])->withInput();
         } 
-        $this->patienService->updateAppointment($appointment,$validator->validated());
+        $this->patientService->updateAppointment($appointment,$validator->validated());
         return redirect()->back()->with('success', 'Appointment updated successfully!');
 
     }
@@ -204,7 +204,7 @@ class ReciptionController extends Controller
         if($current == null){
             $current =GetCurrentDay($days);
         }
-        $appointments =$this->patienService->archive($doctor,$current);
+        $appointments =$this->patientService->archive($doctor,$current);
         return view('reciption.archive',compact('doctor','appointments','days','current'));
     }
     public function test()  {

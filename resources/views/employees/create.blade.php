@@ -38,7 +38,11 @@
                 @enderror
                 <select class="form-select" name="role">
                     <option disabled selected>role</option>
-                    <option value="admin">Admin</option>
+               @can('isSuperAdmin')
+                   
+               <option value="super_admin">Super Admin</option> 
+               <option value="admin">Admin</option> 
+               @endcan   
                     <option value="receptionist">Receptionist</option>
                     <option value="nurse">Nurse</option>
                     <option value="security">Security</option>

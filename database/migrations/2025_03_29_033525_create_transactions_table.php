@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('patien_id')->unsigned();
-            $table->foreign('patien_id')->references('id')->on('patiens')->onDelete('cascade');
+            $table->bigInteger('patient_id')->unsigned();
+            $table->foreign('patient_id')->references('id')->on('patients')->onDelete('cascade');
             $table->bigInteger('appointment_id')->unsigned();
             $table->foreign('appointment_id')->references('id')->on('appointments')->onDelete('cascade');
             $table->string('InvoiceId', 50);

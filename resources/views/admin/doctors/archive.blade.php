@@ -45,10 +45,10 @@
                             {{ $i++ }}
                         </th>
                         <td>
-                            {{ $appointment->patien->name }}
+                            {{ $appointment->patient->name }}
                         </td>
                         <td>
-                            {{ $appointment->patien->phone }}
+                            {{ $appointment->patient->phone }}
                         </td>
                         <td>
                             {{ $appointment->type }}
