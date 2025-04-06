@@ -24,4 +24,20 @@ class Hospital extends Model
         'updated_at',
         'salary'
     ];
+    public function increaseBalance($amount){
+        $current =$this->balance;
+        $this->update([
+            'balance'=>$current + (double) $amount
+        ]);
+    }
+    public function decreaseBalance($amount){
+        $current =$this->balance;
+        if( $current > (double) $amount){
+            $this->update([
+                'balance'=>$current - (double) $amount
+            ]);
+        }else{
+            return redirect()->back()->with('failed','the amount is bigger than balance');
+        }
+    }
 }

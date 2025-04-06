@@ -18,7 +18,7 @@ class UserController extends Controller
  
         if(auth()->attempt(request()->only(['email','password']),
         request()->filled('remember'))){
-                    if(auth()->user()->role == 'admin'){
+                    if(auth()->user()->role == 'admin' || auth()->user()->role == 'super_admin'){
                         return to_route('dashboard');
 
                     }else if(auth()->user()->role == 'receptionist'){

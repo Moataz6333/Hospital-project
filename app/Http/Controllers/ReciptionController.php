@@ -10,6 +10,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use App\Interfaces\PatientInterface;
+use App\Models\Hospital;
+use App\Models\Transaction;
 
 date_default_timezone_set('Africa/Cairo');
 
@@ -45,7 +47,7 @@ class ReciptionController extends Controller
     }
     public function showClinic($id)
     {
-        $clinic = Clinic::findOrFail($id);
+        $clinic = Clinic::findOrFail($id)->load('doctors');
         return view('reciption.show', compact('clinic'));
     }
     public function timeTable($id)
@@ -97,11 +99,14 @@ class ReciptionController extends Controller
                 'phone' => ['required', 'max:13'],
                 'date' => ['required'],
                 'type' => ['required', Rule::in(['examination', 'consultation'])],
+                'age' => ['required'],
+                'gender' => ['required', Rule::in(['male', 'female'])],
                 'payment_method' => ['required', Rule::in(['cash', 'online'])],
                 'paid' => 'nullable',
                 
             ]
         );
+       
         if ($validator->fails()) {
 
             return redirect()->back()->withErrors($validator)->withInput();
@@ -175,6 +180,8 @@ class ReciptionController extends Controller
                 'phone' => ['required', 'max:13'],
                 'date' => ['required'],
                 'type' => ['required', Rule::in(['examination', 'consultation'])],
+                'age' => ['required'],
+                'gender' => ['required', Rule::in(['male', 'female'])],
                 'payment_method' => ['required', Rule::in(['cash', 'online'])],
                 'paid' => 'nullable',
                 
@@ -207,7 +214,20 @@ class ReciptionController extends Controller
         $appointments =$this->patientService->archive($doctor,$current);
         return view('reciption.archive',compact('doctor','appointments','days','current'));
     }
-    public function test()  {
-        
+    // transactions
+    public function transactions($id){
+        $doctor =Doctor::findOrFail($id);
+        $appointments =Appointment::where('doctor_id',$id)->where('payment_method','online')->with('transaction')->where('paid',true)->get()->sortByDesc('date');
+        // dd($appointments);
+        return view('reciption.transactions',compact('appointments','doctor'));
     }
+    public function transaction_delete($id)  {
+        $transaction =Transaction::findOrFail($id);
+        $appointment= $transaction->appointment;
+        $appointment->paid = false;
+        $appointment->save();
+        $transaction->delete();
+        return redirect()->back()->with('success','transaction deleted successfully');
+    }
+   
 }

@@ -33,7 +33,7 @@ class DoctorController extends Controller
         if ($week == "next") {
             $today->modify("+1 week");
         }
-        $appointments = $doctor->appointments->where('date', date($date))->where('status', 'pending');
+        $appointments = $doctor->appointments->where('date', date($date))->where('status', 'pending')->load('patient');
 
 
         return view('doctors.index', compact('doctor', 'days', 'current', 'appointments', 'week', 'date'));
@@ -41,7 +41,7 @@ class DoctorController extends Controller
     public function appointment($id, $from = null)
     {
 
-        $appointment = Appointment::findOrFail($id);
+        $appointment = Appointment::findOrFail($id)->load('patient');
         $times = TimesWhereNotNull($appointment->doctor);
 
 

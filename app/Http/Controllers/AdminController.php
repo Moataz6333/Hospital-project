@@ -29,7 +29,7 @@ class AdminController extends Controller
     public function index()
     {
         // $this->setDate();
-        return view('admin.doctors.index', ['doctors' => Doctor::all()]);
+        return view('admin.doctors.index', ['doctors' => Doctor::all()->load('user')]);
     }
 
     /**
@@ -104,7 +104,7 @@ class AdminController extends Controller
 
     public function edit(string $id)
     {
-        return view('admin.doctors.edit', ['doctor' => Doctor::findOrFail($id), 'clinics' => Clinic::all()]);
+        return view('admin.doctors.edit', ['doctor' => Doctor::findOrFail($id)->load('user'), 'clinics' => Clinic::all()]);
     }
 
     /**
@@ -189,7 +189,7 @@ class AdminController extends Controller
     // timeTable view 
     public function timeTable($id)
     {
-        $doctor = Doctor::findOrFail($id);
+        $doctor = Doctor::findOrFail($id)->load(['timeTable','user']);
         return view('admin.doctors.timeTable', ['doctor' => $doctor]);
     }
     // update time table 

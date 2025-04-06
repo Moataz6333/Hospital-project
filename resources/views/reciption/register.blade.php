@@ -17,7 +17,7 @@
         </div>
     @endif
     <div class="my-3">
-        <form action="{{route('appointment.create',$doctor->id)}}" method="post">
+        <form action="{{ route('appointment.create', $doctor->id) }}" method="post">
             @csrf
             <div class="row my-2">
                 <div class="col">
@@ -25,16 +25,48 @@
                     @error('name')
                         <p class="text-danger "><small>{{ $message }}</small> </p>
                     @enderror
-                    <input type="text" name="name" class="form-control" required placeholder="patient FName LName ." value="{{ old('name') }}">
+                    <input type="text" name="name" class="form-control" required placeholder="patient FName LName ."
+                        value="{{ old('name') }}">
                 </div>
                 <div class="col">
                     <label for="phone" class="form-label">Phone</label>
                     @error('phone')
                         <p class="text-danger "><small>{{ $message }}</small> </p>
                     @enderror
-                    <input type="text" class="form-control" name="phone" placeholder="patient phone ..." value="{{ old('phone') }}">
+                    <input type="text" class="form-control" name="phone" placeholder="patient phone ..."
+                        value="{{ old('phone') }}">
                 </div>
-    
+             
+            </div>
+            <div class="row my-2 ">
+                <div class="col ">
+                    <label for="age" class="form-label"> Age</label>
+                    @error('age')
+                        <p class="text-danger "><small>{{ $message }}</small> </p>
+                    @enderror
+                    <input type="text" name="age" class="form-control" required placeholder="Age"
+                        value="{{ old('age') }}">
+                </div>
+                <div class="col d-flex gap-5 align-items-center">
+                    <label for="gender" class="form-label">Gender</label>
+                    @error('gender')
+                        <p class="text-danger "><small>{{ $message }}</small> </p>
+                    @enderror
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="gender" value="male">
+                        <label class="form-check-label" for="gender">
+                            Male
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="gender" value="female">
+                        <label class="form-check-label" for="gender">
+                            Female
+                        </label>
+                    </div>
+
+                </div>
+                
             </div>
             <div class="row my-2">
                 <div class="col">
@@ -45,9 +77,8 @@
                     <select class="form-select" name="day" required>
                         <option value="" selected disabled>Choose a day</option>
                         @foreach ($days as $key => $day)
-                        
-                        <option value="{{$day}}">{{$day}} from {{$times[$key.'_start']}} To {{$times[$key.'_end']}} </option>
-                            
+                            <option value="{{ $day }}">{{ $day }} from {{ $times[$key . '_start'] }} To
+                                {{ $times[$key . '_end'] }} </option>
                         @endforeach
                     </select>
                 </div>
@@ -58,20 +89,20 @@
                     @enderror
                     <input type="date" class="form-control" name="date" required />
                 </div>
-                
-               
+
+
             </div>
             <div class="row my-2">
-                 <div class="col">
+                <div class="col">
                     <label for="type" class="form-label">Appointment Type</label>
                     @error('type')
                         <p class="text-danger "><small>{{ $message }}</small> </p>
                     @enderror
                     <select class="form-select" name="type" required>
                         <option value="" selected disabled>Choose a Type</option>
-                        <option value="examination"  >examination - كشف</option>
-                        <option value="consultation"  >consultation - استشاره</option>
-                      
+                        <option value="examination">examination - كشف</option>
+                        <option value="consultation">consultation - استشاره</option>
+
                     </select>
                 </div>
                 <div class="col">
@@ -81,9 +112,9 @@
                     @enderror
                     <select class="form-select" name="payment_method" required>
                         <option value="" selected disabled>Choose a Type</option>
-                        <option value="cash"  >cash</option>
-                        <option value="online"  >online</option>
-                      
+                        <option value="cash">cash</option>
+                        <option value="online">online</option>
+
                     </select>
                 </div>
                 <div class="col align-content-end">
@@ -91,11 +122,11 @@
                         <input class="form-check-input" type="checkbox" name="paid">
                         <label class="form-check-label" for="flexCheckDefault">
                             @php
-                                $currency =config('app.currency');
+                                $currency = config('app.currency');
                             @endphp
-                          Paid {{$doctor->price }} {{$currency}}
+                            Paid {{ $doctor->price }} {{ $currency }}
                         </label>
-                      </div>
+                    </div>
                 </div>
             </div>
             <div class="mt-3 d-flex w-100 justify-content-end">

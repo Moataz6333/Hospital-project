@@ -66,6 +66,7 @@ class HospitalController extends Controller
         if ($transaction) {
             
             $html = View::make('exportSheetTemplate', compact('transaction'))->render();
+            // return view('exportSheetTemplate',compact('transaction'));
             $mpdf = new Mpdf([
                 'mode' => 'utf-8',
                 'format' => 'A4',

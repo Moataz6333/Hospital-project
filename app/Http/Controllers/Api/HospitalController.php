@@ -51,6 +51,8 @@ class HospitalController extends Controller
             [
                 'name' => ['required', 'min:3'],
                 'phone' => ['required', 'max:13'],
+                'age' => ['required'],
+                'gender' => ['required', Rule::in(['male', 'female'])],
                 'day' => ['required'],
                 'date' => ['required'],
                 'type' => ['required', Rule::in(['examination', 'consultation'])],

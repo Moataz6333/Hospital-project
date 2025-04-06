@@ -6,10 +6,11 @@ use App\Interfaces\PatientInterface;
 use App\Models\Patient;
 use App\Models\Appointment;
 use App\Jobs\NewAppointmentJob;
+use App\Models\Hospital;
 
 class patientServeice implements PatientInterface
 {
-    
+
 
     public function register_Cash($data, $doctor, $registration_method)
     {
@@ -17,6 +18,8 @@ class patientServeice implements PatientInterface
         $patient = new Patient();
         $patient->name = $data['name'];
         $patient->phone = $data['phone'];
+        $patient->gender = $data['gender'];
+        $patient->age = (int) $data['age'];
         $patient->save();
         $appointment = new Appointment();
         $appointment->patient_id = $patient->id;
@@ -25,8 +28,9 @@ class patientServeice implements PatientInterface
         $appointment->type = $data['type'];
         $appointment->payment_method = $data['payment_method'];
         $appointment->registration_method = $registration_method;
-        if ($registration_method=="reception" && key_exists("paid", $data)) {
+        if ($registration_method == "reception" && key_exists("paid", $data)) {
             $appointment->paid = true;
+            Hospital::first()->increaseBalance($appointment->doctor->price);
         }
         $appointment->save();
         NewAppointmentJob::dispatch($appointment);
@@ -38,6 +42,8 @@ class patientServeice implements PatientInterface
         $patient = new Patient();
         $patient->name = $data['name'];
         $patient->phone = $data['phone'];
+        $patient->gender = $data['gender'];
+        $patient->age = (int) $data['age'];
         $patient->save();
         $appointment = new Appointment();
         $appointment->patient_id = $patient->id;
@@ -49,22 +55,21 @@ class patientServeice implements PatientInterface
 
         $appointment->save();
         NewAppointmentJob::dispatch($appointment);
-       return $appointment;
-
-
-
-
+        return $appointment;
     }
     public function updateAppointment($appointment, $data)
     {
         $patient = $appointment->patient;
         $patient->name = $data['name'];
         $patient->phone = $data['phone'];
+        $patient->gender = $data['gender'];
+        $patient->age = (int) $data['age'];
         $patient->save();
         $appointment->date = $data['date'];
         $appointment->type = $data['type'];
         $appointment->payment_method = $data['payment_method'];
         if (key_exists("paid", $data)) {
+            Hospital::first()->increaseBalance($appointment->doctor->price);
             $appointment->paid = true;
         } else {
             $appointment->paid = false;
@@ -95,7 +100,7 @@ class patientServeice implements PatientInterface
 
         return $appointments;
     }
-    
+
     public function cancel($appointment, $canceldBy)
     {
         if (!in_array($canceldBy, ['doctor', 'patient'])) {
@@ -103,6 +108,9 @@ class patientServeice implements PatientInterface
         }
         $appointment->status = "canceled";
         $appointment->canceled_by = $canceldBy;
+        if ($appointment->paid && $appointment->registration_method == 'reception') {
+            Hospital::first()->decreaseBalance($appointment->doctor->price);
+        }
         $appointment->save();
     }
 }

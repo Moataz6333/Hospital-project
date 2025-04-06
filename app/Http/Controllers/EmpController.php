@@ -19,7 +19,7 @@ class EmpController extends Controller
      */
     public function index()
     {
-        return view('employees.index', ['employees' => Employee::all()]);
+        return view('employees.index', ['employees' => Employee::all()->load('user')]);
     }
 
     /**
@@ -97,7 +97,7 @@ class EmpController extends Controller
     public function show(string $id)
     {
 
-        $emp = Employee::findOrFail($id);
+        $emp = Employee::findOrFail($id)->load('user');
         return view('employees.show', ['emp' => $emp]);
     }
 

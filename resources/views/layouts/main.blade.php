@@ -135,6 +135,14 @@
                                             add employee
                                         </a>
                                     </li>
+                                    @can('isSuperAdmin')
+                                    <li class="nav-item ms-2">
+                                        <a class="nav-link" href="{{ route('roles.index') }}">
+                                            <span data-feather="alert-circle"></span>
+                                            roles
+                                        </a>
+                                    </li>
+                                    @endcan
                                 </ul>
                             </div>
                         </li>

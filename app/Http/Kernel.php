@@ -67,5 +67,6 @@ class Kernel extends HttpKernel
         'admin_only' => \App\Http\Middleware\AdminMiddleware::class,
         'receptionist_only' => \App\Http\Middleware\ReceptionMiddleware::class,
         'doctor_only' => \App\Http\Middleware\DoctorMiddleware::class,
+        'superAdmin_only' => \App\Http\Middleware\SuperAdminMiddleWare::class,
     ];
 }

@@ -9,6 +9,7 @@ use App\Http\Controllers\ClinicController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\EmpController;
 use App\Http\Controllers\ReciptionController;
+use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Broadcast;
 
 Broadcast::routes(['middleware' => ['auth:sanctum']]);
@@ -56,6 +57,9 @@ Route::middleware(['auth:sanctum', 'receptionist_only'])->group(function () {
     Route::post('/appointment/update/{id}', [ReciptionController::class, 'updateAppointment'])->name('appointment.update');
     Route::delete('/appointment/delete/{id}', [ReciptionController::class, 'deleteAppointment'])->name('appointment.destroy');
     Route::get('/reception/doctors/archive/{id}/{day?}', [ReciptionController::class, 'archive'])->name('reception.archive');
+    Route::get('/reception/transactions/{id}', [ReciptionController::class, 'transactions'])->name('reception.transactions');
+    Route::delete('/reception/transactions/delete/{id}', [ReciptionController::class, 'transaction_delete'])->name('transaction.delete');
+    
     // Route::get('/test',[ReciptionController::class,'test']);
 
 });
@@ -68,7 +72,12 @@ Route::middleware(['auth:sanctum', 'doctor_only'])->group(function () {
     Route::get('/appointment/done/{id}', [DoctorController::class, 'done'])->name('appointment.done');
     Route::get('/appointment/doctor/cancel/{id}', [DoctorController::class, 'cancel'])->name('appointment.doctor.cancel');
 });
+
+// superAdmin routes
+Route::middleware(['auth:sanctum', 'superAdmin_only'])->group(function () {
+    Route::resource('roles', RoleController::class); 
+});
+
 // hosptial
 Route::get('/sheet/{id}', [HospitalController::class, 'sheet'])->name('hospital.sheet');
 Route::get('/export/{id}', [HospitalController::class, 'exportSheet'])->name('sheet.download');
-Route::get('test', function () {});

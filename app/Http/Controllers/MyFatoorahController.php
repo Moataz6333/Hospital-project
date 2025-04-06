@@ -48,7 +48,7 @@ class MyFatoorahController extends Controller
     {
         try {
             //For example: pmid=0 for MyFatoorah invoice or pmid=1 for Knet in test mode
-            $paymentId = request('pmid') ?: 0;
+            $paymentId = request('pmid') ?: 2;
             $sessionId = request('sid') ?: null;
 
             $orderId  = request('oid') ?: 147;
@@ -56,8 +56,9 @@ class MyFatoorahController extends Controller
 
             $mfObj   = new MyFatoorahPayment($this->mfConfig);
             $payment = $mfObj->getInvoiceURL($curlData, $paymentId, $orderId, $sessionId);
-
-            return redirect($payment['invoiceURL']);
+                // dd($payment);
+                return redirect()->away($payment['invoiceURL']);
+            // return redirect($payment['invoiceURL']);
         } catch (Exception $ex) {
             $exMessage = __('from index myfatoorah.' . $ex->getMessage());
             return response()->json(['IsSuccess' => 'false', 'Message' => $exMessage]);
@@ -85,6 +86,7 @@ class MyFatoorahController extends Controller
             'CustomerName'       => $order['name'],
             'InvoiceValue'       => $order['total'],
             'DisplayCurrencyIso' => $order['currency'],
+            'CustomerEmail'      => 'test@test.com',
             'CallBackUrl'        => $callbackURL,
             'ErrorUrl'           => $callbackURL,
             'MobileCountryCode'  => '+20',
@@ -114,6 +116,7 @@ class MyFatoorahController extends Controller
             $message = $this->getTestMessage($data->InvoiceStatus, $data->InvoiceError);
 
             $response = ['IsSuccess' => true, 'Message' => $message, 'Data' => $data];
+            // return $response;
             // save the transaction
             if ($data->InvoiceStatus == "Paid") {
                 DB::beginTransaction();
@@ -135,6 +138,7 @@ class MyFatoorahController extends Controller
                     'CardNumber' => str_repeat("x", strlen($data->InvoiceTransactions[0]->CardNumber) - 4) . substr($data->InvoiceTransactions[0]->CardNumber, -4),
                 ]);
                 DB::commit();
+                // return $response;
                 if($transaction->appointment->registration_method == 'reception'){
                     return to_route('reception.appointment.show',$transaction->appointment->id);
                 }else{
