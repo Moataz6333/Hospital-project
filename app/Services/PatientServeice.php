@@ -59,6 +59,7 @@ class patientServeice implements PatientInterface
     }
     public function updateAppointment($appointment, $data)
     {
+       
         $patient = $appointment->patient;
         $patient->name = $data['name'];
         $patient->phone = $data['phone'];

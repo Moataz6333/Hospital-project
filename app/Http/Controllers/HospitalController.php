@@ -51,7 +51,6 @@ class HospitalController extends Controller
     }
     public function sheet($id)
     {
-
         $transaction = Transaction::where('PaymentId', $id)->first();
         if ($transaction) {
             return view('sheet', compact('transaction'));

@@ -7,6 +7,7 @@ use App\Http\Controllers\HospitalController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ClinicController;
 use App\Http\Controllers\DoctorController;
+use App\Http\Controllers\DonationController;
 use App\Http\Controllers\EmpController;
 use App\Http\Controllers\ReciptionController;
 use App\Http\Controllers\RoleController;
@@ -59,9 +60,8 @@ Route::middleware(['auth:sanctum', 'receptionist_only'])->group(function () {
     Route::get('/reception/doctors/archive/{id}/{day?}', [ReciptionController::class, 'archive'])->name('reception.archive');
     Route::get('/reception/transactions/{id}', [ReciptionController::class, 'transactions'])->name('reception.transactions');
     Route::delete('/reception/transactions/delete/{id}', [ReciptionController::class, 'transaction_delete'])->name('transaction.delete');
-    
+    Route::resource('/donations',DonationController::class);
     // Route::get('/test',[ReciptionController::class,'test']);
-
 });
 
 // doctor
@@ -81,3 +81,10 @@ Route::middleware(['auth:sanctum', 'superAdmin_only'])->group(function () {
 // hosptial
 Route::get('/sheet/{id}', [HospitalController::class, 'sheet'])->name('hospital.sheet');
 Route::get('/export/{id}', [HospitalController::class, 'exportSheet'])->name('sheet.download');
+// donation
+Route::get('/donation/sheet/{id}', [DonationController::class,'sheet'])->name('donation.sheet');
+Route::get('/donation/export/{id}', [DonationController::class,'export'])->name('donation.export');
+
+Route::get('/test', function () {
+   
+});

@@ -15,7 +15,8 @@
                     class="btn btn-info ml-3">Invoice</a>
             @endif
             @if (!$appointment->paid && $appointment->payment_method == 'online')
-                <a href="{{env('APP_URL')}}/myfatoorah/checkout?oid={{$appointment->id}}" class="btn btn-success">Pay Online</a>
+                <a href="{{ env('APP_URL') }}/myfatoorah/checkout?oid={{ $appointment->id }}" class="btn btn-success">Pay
+                    Online</a>
             @endif
         </h2>
         <hr>
@@ -48,6 +49,36 @@
                     @enderror
                     <input type="text" class="form-control" name="phone" placeholder="patient phone ..."
                         value="{{ $appointment->patient->phone }}">
+                </div>
+
+            </div>
+            <div class="row my-2 ">
+                <div class="col ">
+                    <label for="age" class="form-label"> Age</label>
+                    @error('age')
+                        <p class="text-danger "><small>{{ $message }}</small> </p>
+                    @enderror
+                    <input type="text" name="age" class="form-control" required placeholder="Age"
+                        value="{{ $appointment->patient->age }}">
+                </div>
+                <div class="col d-flex gap-5 align-items-center">
+                    <label for="gender" class="form-label">Gender</label>
+                    @error('gender')
+                        <p class="text-danger "><small>{{ $message }}</small> </p>
+                    @enderror
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="gender" value="male" @if( $appointment->patient->gender == "male") checked @endif>
+                        <label class="form-check-label" for="gender">
+                            Male
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="gender" value="female" @if( $appointment->patient->gender == "female") checked @endif>
+                        <label class="form-check-label" for="gender">
+                            Female
+                        </label>
+                    </div>
+
                 </div>
 
             </div>

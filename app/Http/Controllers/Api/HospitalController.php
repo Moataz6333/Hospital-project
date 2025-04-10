@@ -14,13 +14,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use App\Interfaces\PatientInterface;
+use App\Interfaces\PaymentInterface;
+use App\Services\DonationService;
 
 class HospitalController extends Controller
 {
     protected $patientService;
-    public function __construct(PatientInterface $patientService)
-    {
+    protected $paymentService;
+    public function __construct(
+        PatientInterface $patientService,
+        PaymentInterface $paymentService
+    ) {
         $this->patientService = $patientService;
+        $this->paymentService = $paymentService;
     }
     public function Hospital()
     {
@@ -44,7 +50,7 @@ class HospitalController extends Controller
     // create Appointment 
     public function createAppointment(Request $request)
     {
-       
+
         $doctor = Doctor::findOrFail($request->doctor_id);
         $validator =  Validator::make(
             $request->all(),
@@ -77,7 +83,7 @@ class HospitalController extends Controller
         $registration_method = 'website';
         if ($request->payment_method == 'cash') {
 
-            $appointment = new AppointmentResource( $this->patientService->register_Cash($validator->validated(), $doctor, $registration_method)) ;
+            $appointment = new AppointmentResource($this->patientService->register_Cash($validator->validated(), $doctor, $registration_method));
             return response()->json([
                 'message' => "Regestration Done Successfully",
                 'appointment' => $appointment
@@ -85,11 +91,32 @@ class HospitalController extends Controller
         } else {
 
             $appointment =  $this->patientService->register_Online($validator->validated(), $doctor, $registration_method);
-            return response()->json([
-                "message"=>"appointment created",
-                "link"=>env("APP_URL")."/myfatoorah/checkout?oid={$appointment->id}"
-            ], 200);
+            return $this->paymentService->pay($appointment);
             // return redirect("myfatoorah/checkout?oid={$appointment->id}");
         }
+    }
+    // donate
+    public function donate(Request $request) {
+        $validator =  Validator::make(
+            $request->all(),
+            [
+                'name' => ['required', 'min:3'],
+                'phone' => ['required', 'max:13'],
+                'national_id' => ['required', 'max:50'],
+                'value' => ['required'],
+                'currency' => ['required', Rule::in(['EGP', 'KWD'])],
+            ]
+        );
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation errors',
+                'errors' => $validator->errors(),  // Return validation errors
+            ], 422);
+        }
+        $donationService =new DonationService();
+        $donation =$donationService->registerOnline($validator->validated(),'website');
+         return $this->paymentService->donate($donation);
+
     }
 }

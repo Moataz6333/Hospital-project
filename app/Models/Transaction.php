@@ -12,6 +12,7 @@ class Transaction extends Model
     protected $fillable=[
         'patient_id',
         'appointment_id',
+        'donation_id',
         'InvoiceId',
         'InvoiceReference',
         'InvoiceValue',
@@ -27,5 +28,8 @@ class Transaction extends Model
     }
     public function appointment()  {
         return $this->belongsTo(Appointment::class);
+    }
+    public function donation()  {
+        return $this->belongsTo(Donation::class);
     }
 }

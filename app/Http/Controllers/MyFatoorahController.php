@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use App\Models\Donation;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -35,6 +36,7 @@ class MyFatoorahController extends Controller
             'countryCode' => config('myfatoorah.country_iso'),
         ];
     }
+   
 
     //-----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -51,14 +53,24 @@ class MyFatoorahController extends Controller
             $paymentId = request('pmid') ?: 2;
             $sessionId = request('sid') ?: null;
 
-            $orderId  = request('oid') ?: 147;
-            $curlData = $this->getPayLoadData($orderId);
+            if(request()->filled('oid')){
+                $orderId  = request('oid') ;
+                $curlData = $this->getPayLoadData($orderId);
 
-            $mfObj   = new MyFatoorahPayment($this->mfConfig);
-            $payment = $mfObj->getInvoiceURL($curlData, $paymentId, $orderId, $sessionId);
+                $mfObj   = new MyFatoorahPayment($this->mfConfig);
+                $payment = $mfObj->getInvoiceURL($curlData, $paymentId, $orderId, $sessionId);
                 // dd($payment);
                 return redirect()->away($payment['invoiceURL']);
-            // return redirect($payment['invoiceURL']);
+
+            }elseif(request()->filled('did')){
+                $orderId  = request('did') ;
+                $curlData = $this->getPayLoadDonationData($orderId);
+    
+                $mfObj   = new MyFatoorahPayment($this->mfConfig);
+                $payment = $mfObj->getInvoiceURL($curlData, $paymentId, $orderId, $sessionId);
+                // dd($payment);
+                return redirect()->away($payment['invoiceURL']);
+            }
         } catch (Exception $ex) {
             $exMessage = __('from index myfatoorah.' . $ex->getMessage());
             return response()->json(['IsSuccess' => 'false', 'Message' => $exMessage]);
@@ -81,7 +93,7 @@ class MyFatoorahController extends Controller
 
         //You can get the data using the order object in your system
         $order = $this->getTestOrderData($orderId);
-
+        
         return [
             'CustomerName'       => $order['name'],
             'InvoiceValue'       => $order['total'],
@@ -93,7 +105,29 @@ class MyFatoorahController extends Controller
             'CustomerMobile'     => $order['phone'],
             'Language'           => 'en',
             'CustomerReference'  => $orderId,
-            'SourceInfo'         => 'Laravel ' . app()::VERSION . ' - MyFatoorah Package ' . MYFATOORAH_LARAVEL_PACKAGE_VERSION
+            'SourceInfo'         => 'Laravel ' . app()::VERSION . ' - MyFatoorah Package ' . MYFATOORAH_LARAVEL_PACKAGE_VERSION,
+            'UserDefinedField'           =>'appointment'       ,
+        ];
+    }
+    private function getPayLoadDonationData($orderId = null)
+    {
+        $callbackURL = route('myfatoorah.callback');
+
+        //You can get the data using the order object in your system
+        $order = $this->getDonationData($orderId);
+        
+        return [
+            'CustomerName'       => $order['name'],
+            'InvoiceValue'       => $order['total'],
+            'DisplayCurrencyIso' => $order['currency'],
+            'CallBackUrl'        => $callbackURL,
+            'ErrorUrl'           => $callbackURL,
+            'MobileCountryCode'  => '+20',
+            'CustomerMobile'     => $order['phone'],
+            'Language'           => 'en',
+            'CustomerReference'  => $orderId,
+            'SourceInfo'         => 'Laravel ' . app()::VERSION . ' - MyFatoorah Package ' . MYFATOORAH_LARAVEL_PACKAGE_VERSION,
+            'UserDefinedField'           =>'donation' 
         ];
     }
 
@@ -116,34 +150,68 @@ class MyFatoorahController extends Controller
             $message = $this->getTestMessage($data->InvoiceStatus, $data->InvoiceError);
 
             $response = ['IsSuccess' => true, 'Message' => $message, 'Data' => $data];
+
             // return $response;
-            // save the transaction
-            if ($data->InvoiceStatus == "Paid") {
-                DB::beginTransaction();
-                $appointment = Appointment::findOrFail($data->CustomerReference);
-                $appointment->paid = true;
-                $appointment->save();
-                // save the Transaction
-                $transaction  = Transaction::create([
-                    'patient_id' => $appointment->patient->id,
-                    'appointment_id' => $appointment->id,
-                    'InvoiceId' => $data->InvoiceId,
-                    'InvoiceReference' => $data->InvoiceReference,
-                    'InvoiceValue' => (double) $data->InvoiceValue,
-                    'Currency' => $data->InvoiceTransactions[0]->PaidCurrency,
-                    'CustomerName' => $data->CustomerName,
-                    'CustomerMobile' => $data->CustomerMobile,
-                    'PaymentGateway' => $data->InvoiceTransactions[0]->PaymentGateway,
-                    'PaymentId' => $data->InvoiceTransactions[0]->PaymentId,
-                    'CardNumber' => str_repeat("x", strlen($data->InvoiceTransactions[0]->CardNumber) - 4) . substr($data->InvoiceTransactions[0]->CardNumber, -4),
-                ]);
-                DB::commit();
-                // return $response;
-                if($transaction->appointment->registration_method == 'reception'){
-                    return to_route('reception.appointment.show',$transaction->appointment->id);
-                }else{
-                    return to_route('hospital.sheet',$transaction->PaymentId);
+           
+            if($data->UserDefinedField == 'appointment'){
+                // save the transaction
+                if ($data->InvoiceStatus == "Paid") {
+                    DB::beginTransaction();
+                    $appointment = Appointment::findOrFail($data->CustomerReference)->load(['patient', 'doctor']);
+                    $appointment->paid = true;
+                    $appointment->save();
+                    // save the Transaction
+                    $transaction  = Transaction::create([
+                        'patient_id' => $appointment->patient->id,
+                        'appointment_id' => $appointment->id,
+                        'InvoiceId' => $data->InvoiceId,
+                        'InvoiceReference' => $data->InvoiceReference,
+                        'InvoiceValue' => (float) $data->InvoiceValue,
+                        'Currency' => $data->InvoiceTransactions[0]->PaidCurrency,
+                        'CustomerName' => $data->CustomerName,
+                        'CustomerMobile' => $data->CustomerMobile,
+                        'PaymentGateway' => $data->InvoiceTransactions[0]->PaymentGateway,
+                        'PaymentId' => $data->InvoiceTransactions[0]->PaymentId,
+                        'CardNumber' => str_repeat("x", strlen($data->InvoiceTransactions[0]->CardNumber) - 4) . substr($data->InvoiceTransactions[0]->CardNumber, -4),
+                    ]);
+                    DB::commit();
+                    // return $response;
+                    if ($transaction->appointment->registration_method == 'reception') {
+                        return to_route('reception.appointment.show', $transaction->appointment->id)->with('success', 'payment done successfully!');
+                    } else {
+                        return to_route('hospital.sheet', $transaction->PaymentId);
+                    }
                 }
+
+            }elseif($data->UserDefinedField == 'donation'){
+                // save the transaction
+                if ($data->InvoiceStatus == "Paid") {
+                    DB::beginTransaction();
+                    $donation = Donation::findOrFail($data->CustomerReference);
+                   $donation->paid=true;
+                   $donation->save();
+                    // save the Transaction
+                    $transaction  = Transaction::create([
+                        'donation_id'=>$donation->id,
+                        'InvoiceId' => $data->InvoiceId,
+                        'InvoiceReference' => $data->InvoiceReference,
+                        'InvoiceValue' => (float) $data->InvoiceValue,
+                        'Currency' => $data->InvoiceTransactions[0]->PaidCurrency,
+                        'CustomerName' => $data->CustomerName,
+                        'CustomerMobile' => $data->CustomerMobile,
+                        'PaymentGateway' => $data->InvoiceTransactions[0]->PaymentGateway,
+                        'PaymentId' => $data->InvoiceTransactions[0]->PaymentId,
+                        'CardNumber' => str_repeat("x", strlen($data->InvoiceTransactions[0]->CardNumber) - 4) . substr($data->InvoiceTransactions[0]->CardNumber, -4),
+                    ]);
+                    DB::commit();
+                    // return $response;
+                    if ($transaction->donation->registration_method == 'reception') {
+                        return to_route('reception.donations.show', $transaction->donation->id)->with('success', 'payment done successfully!');
+                    } else {
+                       
+                    }
+                }
+                // return $response;
             }
         } catch (Exception $ex) {
             DB::rollBack();
@@ -152,7 +220,7 @@ class MyFatoorahController extends Controller
         }
         return response()->json($response);
     }
-
+    
     //-----------------------------------------------------------------------------------------------------------------------------------------
 
     /**
@@ -165,35 +233,66 @@ class MyFatoorahController extends Controller
     {
         try {
             //You can get the data using the order object in your system
-            $orderId = request('oid');
-            $order   = $this->getTestOrderData($orderId);
+            if (request()->filled('oid')) {
+                $orderId = request('oid');
+                $order   = $this->getTestOrderData($orderId);
 
+                //You can replace this variable with customer Id in your system
+                $customerId = $order['patient_id'];
 
-            //You can replace this variable with customer Id in your system
-            $customerId = $order['patient_id'];
+                //You can use the user defined field if you want to save card
+                $userDefinedField = config('myfatoorah.save_card') && $customerId ? "CK-$customerId" : '';
 
-            //You can use the user defined field if you want to save card
-            $userDefinedField = config('myfatoorah.save_card') && $customerId ? "CK-$customerId" : '';
+                //Get the enabled gateways at your MyFatoorah acount to be displayed on checkout page
+                $mfObj          = new MyFatoorahPaymentEmbedded($this->mfConfig);
+                $paymentMethods = $mfObj->getCheckoutGateways($order['total'], $order['currency'], config('myfatoorah.register_apple_pay'));
 
-            //Get the enabled gateways at your MyFatoorah acount to be displayed on checkout page
-            $mfObj          = new MyFatoorahPaymentEmbedded($this->mfConfig);
-            $paymentMethods = $mfObj->getCheckoutGateways($order['total'], $order['currency'], config('myfatoorah.register_apple_pay'));
+                if (empty($paymentMethods['all'])) {
+                    throw new Exception('noPaymentGateways');
+                }
 
-            if (empty($paymentMethods['all'])) {
-                throw new Exception('noPaymentGateways');
+                //Generate MyFatoorah session for embedded payment
+                $mfSession = $mfObj->getEmbeddedSession($userDefinedField);
+
+                //Get Environment url
+                $isTest = $this->mfConfig['isTest'];
+                $vcCode = $this->mfConfig['countryCode'];
+
+                $countries = MyFatoorah::getMFCountries();
+                $jsDomain  = ($isTest) ? $countries[$vcCode]['testPortal'] : $countries[$vcCode]['portal'];
+
+                return view('myfatoorah.checkout', compact('mfSession', 'paymentMethods', 'jsDomain', 'userDefinedField'));
+            }elseif(request()->filled('did')){
+                $orderId = request('did');
+                
+                $order   = $this->getDonationData($orderId);
+               
+                //You can replace this variable with customer Id in your system
+                $customerId = $order['national_id'];
+
+                //You can use the user defined field if you want to save card
+                $userDefinedField = config('myfatoorah.save_card') && $customerId ? "CK-$customerId" : '';
+
+                //Get the enabled gateways at your MyFatoorah acount to be displayed on checkout page
+                $mfObj          = new MyFatoorahPaymentEmbedded($this->mfConfig);
+                $paymentMethods = $mfObj->getCheckoutGateways($order['total'], $order['currency'], config('myfatoorah.register_apple_pay'));
+
+                if (empty($paymentMethods['all'])) {
+                    throw new Exception('noPaymentGateways');
+                }
+
+                //Generate MyFatoorah session for embedded payment
+                $mfSession = $mfObj->getEmbeddedSession($userDefinedField);
+
+                //Get Environment url
+                $isTest = $this->mfConfig['isTest'];
+                $vcCode = $this->mfConfig['countryCode'];
+
+                $countries = MyFatoorah::getMFCountries();
+                $jsDomain  = ($isTest) ? $countries[$vcCode]['testPortal'] : $countries[$vcCode]['portal'];
+
+                return view('myfatoorah.checkout', compact('mfSession', 'paymentMethods', 'jsDomain', 'userDefinedField'));
             }
-
-            //Generate MyFatoorah session for embedded payment
-            $mfSession = $mfObj->getEmbeddedSession($userDefinedField);
-
-            //Get Environment url
-            $isTest = $this->mfConfig['isTest'];
-            $vcCode = $this->mfConfig['countryCode'];
-
-            $countries = MyFatoorah::getMFCountries();
-            $jsDomain  = ($isTest) ? $countries[$vcCode]['testPortal'] : $countries[$vcCode]['portal'];
-
-            return view('myfatoorah.checkout', compact('mfSession', 'paymentMethods', 'jsDomain', 'userDefinedField'));
         } catch (Exception $ex) {
             $exMessage = __('myfatoorah.' . $ex->getMessage());
             return view('myfatoorah.error', compact('exMessage'));
@@ -202,6 +301,46 @@ class MyFatoorahController extends Controller
 
     //-----------------------------------------------------------------------------------------------------------------------------------------
 
+
+
+    //-----------------------------------------------------------------------------------------------------------------------------------------
+    private function getTestOrderData($orderId)
+    {
+        $appointment = Appointment::findOrFail($orderId);
+        return [
+            'name' => $appointment->patient->name,
+            'phone' => str_starts_with($appointment->patient->phone, "0") ? ltrim($appointment->patient->phone, '0') : $appointment->patient->phone,
+            'patient_id' => $appointment->patient->id,
+            'total'    => (float) $appointment->doctor->price,
+            'currency' => config('app.currency', 'EGP'),
+            'type'=>'appointment'
+        ];
+    }
+    private function getDonationData($orderId){
+        $donation =Donation::findOrFail($orderId);
+       
+        return [
+            'name' => $donation->name,
+            'phone' => $donation->phone,
+            'national_id' => $donation->national_id,
+            'total'    => (double) $donation->value,
+            'currency' => config('app.currency', 'EGP'),
+            'type'=>'donation'
+
+        ];
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------------------------------
+    private function getTestMessage($status, $error)
+    {
+        if ($status == 'Paid') {
+            return 'Invoice is paid.';
+        } else if ($status == 'Failed') {
+            return 'Invoice is not paid due to ' . $error;
+        } else if ($status == 'Expired') {
+            return $error;
+        }
+    }
     /**
      * Example on how the webhook is working when MyFatoorah try to notify your system about any transaction status update
      */
@@ -267,31 +406,6 @@ class MyFatoorahController extends Controller
 
         //4. Update order transaction status on your system
         return ['IsSuccess' => true, 'Message' => $message, 'Data' => $inputData];
-    }
-
-    //-----------------------------------------------------------------------------------------------------------------------------------------
-    private function getTestOrderData($orderId)
-    {
-        $appointment = Appointment::findOrFail($orderId);
-        return [
-            'name' => $appointment->patient->name,
-            'phone' => str_starts_with($appointment->patient->phone, "0") ? ltrim($appointment->patient->phone, '0') : $appointment->patient->phone,
-            'patient_id' => $appointment->patient->id,
-            'total'    => (float) $appointment->doctor->price,
-            'currency' => config('app.currency', 'EGP')
-        ];
-    }
-
-    //-----------------------------------------------------------------------------------------------------------------------------------------
-    private function getTestMessage($status, $error)
-    {
-        if ($status == 'Paid') {
-            return 'Invoice is paid.';
-        } else if ($status == 'Failed') {
-            return 'Invoice is not paid due to ' . $error;
-        } else if ($status == 'Expired') {
-            return $error;
-        }
     }
 
     //-----------------------------------------------------------------------------------------------------------------------------------------

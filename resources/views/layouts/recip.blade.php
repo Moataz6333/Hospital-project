@@ -63,6 +63,29 @@
                                 Clinics
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="collapse" href="#donations" role="button"
+                                aria-expanded="false" aria-controls="donations">
+                                <span data-feather="user"></span>
+                                Donations
+                            </a>
+                            <div class="collapse" id="donations">
+                                <ul class="nav flex-column ">
+                                    <li class="nav-item ms-2">
+                                        <a class="nav-link" href="{{ route('donations.index') }}">
+                                            <span data-feather="hash"></span>
+                                            all donations
+                                        </a>
+                                    </li>
+                                    <li class="nav-item ms-2">
+                                        <a class="nav-link" href="{{ route('donations.create') }}">
+                                            <span data-feather="user-plus"></span>
+                                            donate
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
                        
 
                     </ul>

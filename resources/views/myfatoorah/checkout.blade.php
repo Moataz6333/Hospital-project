@@ -76,10 +76,11 @@
             <script src="{{asset('vendor/myfatoorah/js/checkout.js')}}"></script>
             <script>
                 var appointmentId = "{{ request('oid') }}"; // Getting 'oid' from the request
+                var donationId = "{{ request('did') }}"; // Getting 'oid' from the request
             </script>
             <script>
                 function mfCallback(response) {
-                    window.location.href = "{{url('myfatoorah')}}?sid=" + response.sessionId + "&oid=" + appointmentId;
+                    window.location.href = "{{url('myfatoorah')}}?sid=" + response.sessionId + "&oid=" + appointmentId +"&did=" + donationId;
                 }
             </script>
 

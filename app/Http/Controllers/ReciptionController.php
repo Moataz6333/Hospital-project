@@ -10,6 +10,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use App\Interfaces\PatientInterface;
+use App\Interfaces\PaymentInterface;
+use App\Models\Donation;
 use App\Models\Hospital;
 use App\Models\Transaction;
 
@@ -19,9 +21,12 @@ date_default_timezone_set('Africa/Cairo');
 class ReciptionController extends Controller
 {
     protected $patientService;
-    public function __construct(PatientInterface $patientService)
+    protected $paymentService;
+    public function __construct(PatientInterface $patientService,
+    PaymentInterface $paymentService)
     {
         $this->patientService = $patientService;
+        $this->paymentService = $paymentService;
     }
     public function index()
     {
@@ -124,7 +129,7 @@ class ReciptionController extends Controller
         }else{
 
           $appointment=  $this->patientService->register_Online($validator->validated(),$doctor,$registration_method);
-            return redirect("myfatoorah/checkout?oid={$appointment->id}");
+            return  $this->paymentService->pay($appointment);
         }
 
     
@@ -147,7 +152,7 @@ class ReciptionController extends Controller
     // show appointment
     public function appointment($id,$from=null)  {
         
-        $appointment = Appointment::findOrFail($id);
+        $appointment = Appointment::findOrFail($id)->load(['patient','doctor']);
         $times = TimesWhereNotNull($appointment->doctor);
 
 
@@ -187,6 +192,7 @@ class ReciptionController extends Controller
                 
             ]
         );
+        // dd($request->all());
         if ($validator->fails()) {
 
             return redirect()->back()->withErrors($validator)->withInput();
@@ -229,5 +235,6 @@ class ReciptionController extends Controller
         $transaction->delete();
         return redirect()->back()->with('success','transaction deleted successfully');
     }
+ 
    
 }
