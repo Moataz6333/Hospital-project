@@ -24,25 +24,20 @@ class RoleController extends Controller
         Role::create([
             'name' =>$request->name,
             'salary' =>(double) $request->salary,
-            'incentives' => $request->incentives ?? 0,
+            'incentives' =>(double) $request->incentives ?? 0,
         ]);
         return redirect()->back()->with('success','role added successfully');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+    
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
     {
-        //
+        $role=Role::findOrFail($id);
+        return view('admin.roles.edit',compact('role'));
     }
 
     /**
@@ -50,7 +45,14 @@ class RoleController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $role=Role::findOrFail($id);
+        $role->update([
+            'name' =>$request->name,
+            'salary' =>(double) $request->salary,
+            'incentives' =>(double) $request->incentives ?? 0,
+        ]);
+        return redirect()->back()->with('success','role updated successfully');
+
     }
 
     /**
@@ -58,6 +60,9 @@ class RoleController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $role=Role::findOrFail($id);
+        $role->delete();
+        return view('admin.roles.index',['roles'=>Role::all()]);
+        
     }
 }

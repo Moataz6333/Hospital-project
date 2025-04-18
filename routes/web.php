@@ -24,7 +24,7 @@ Route::view('/login', 'login');
 Route::post('/login', [UserController::class, 'login'])->name('login');
 Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 
-// auth
+// admin
 Route::middleware(['auth:sanctum', 'admin_only'])->group(function () {
     Route::view('/register', 'register');
     Route::post('/register', [UserController::class, 'store'])->name('users.store');
@@ -42,6 +42,9 @@ Route::middleware(['auth:sanctum', 'admin_only'])->group(function () {
     Route::get('/AllDoctors', [AdminController::class, 'getAllDoctors'])->name('doctors.json');
     Route::get('/doctors/archive/{id}/{day?}', [AdminController::class, 'archive'])->name('doctors.archive');
     Route::get('/doctors/appointment/{id}', [AdminController::class, 'appointment'])->name('doctors.appointment.show');
+    Route::get('/salaries',[EmpController::class,'salaries'])->name('employees.salaries');
+    Route::get('increase/{amount}', [DashboardController::class,'increase']);
+    Route::get('total', [DashboardController::class,'total'])->name('total.json');
 });
 
 // reciptionist
@@ -61,6 +64,9 @@ Route::middleware(['auth:sanctum', 'receptionist_only'])->group(function () {
     Route::get('/reception/transactions/{id}', [ReciptionController::class, 'transactions'])->name('reception.transactions');
     Route::delete('/reception/transactions/delete/{id}', [ReciptionController::class, 'transaction_delete'])->name('transaction.delete');
     Route::resource('/donations',DonationController::class);
+    Route::post('/donations/search', [DonationController::class,'search'])->name('donations.search');
+    Route::get('/Alldonations', [DonationController::class,'getAllDonations'])->name('donations.json');
+    Route::post('/hasDicount', [ReciptionController::class, 'hasDiscount'])->name('patient.discount');
     // Route::get('/test',[ReciptionController::class,'test']);
 });
 
@@ -85,6 +91,6 @@ Route::get('/export/{id}', [HospitalController::class, 'exportSheet'])->name('sh
 Route::get('/donation/sheet/{id}', [DonationController::class,'sheet'])->name('donation.sheet');
 Route::get('/donation/export/{id}', [DonationController::class,'export'])->name('donation.export');
 
-Route::get('/test', function () {
+Route::get('/test/{amount}', function ($amount) {
    
 });

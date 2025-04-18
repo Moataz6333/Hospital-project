@@ -1,7 +1,7 @@
 <?php
 use Illuminate\Support\Facades\Http;
 
-
+use App\Models\Hospital;
 
 function TimesWhereNotNull($doctor)
 {
@@ -47,3 +47,7 @@ function AllDays() {
     $AllDays = ['sat' => 'Saturday', 'sun' => 'Sunday', 'mon' => 'Monday', 'tue' => 'Tuesday', 'wed' => 'Wednesday', 'thurs' => 'Thursday', 'fri' => 'Friday'];
     return $AllDays;
 }
+
+// function increateBalance($amount) {
+//     // Hospital::first()
+// }

@@ -17,10 +17,7 @@ class EGP_balanceService implements BalanceInterface{
     }
 
     public function getBalance(){
-        $this->hospital->update([
-            'balance'=> $this->getTransactions() + $this->getCash()
-        ]);
-        return $this->hospital->balance;
+        return round($this->hospital->balance);
       }
       public function getTransactions() {
           $transactions=Transaction::where('service','myfatoorah')->sum('InvoiceValue');
@@ -39,6 +36,12 @@ class EGP_balanceService implements BalanceInterface{
           $doctors_salaries=Doctor::sum('salary');
           $employees_salaries=Employee::sum('salary');
           return $doctors_salaries + $employees_salaries;
+      }
+      public function increase($amount)  {
+       
+        $this->hospital->increaseBalance((double)$amount);
+      
+       
       }
 
 }

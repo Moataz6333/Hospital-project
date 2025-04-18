@@ -36,7 +36,17 @@
                     <input type="text" class="form-control" name="phone" placeholder="patient phone ..."
                         value="{{ old('phone') }}">
                 </div>
-             
+                <div class="col">
+                    <label for="national_id" class="form-label">National id</label>
+                   
+                    @error('national_id')
+                        <p class="text-danger "><small>{{ $message }}</small> </p>
+                    @enderror
+                    <input type="text" class="form-control" name="national_id" placeholder="Nationl id (op) ..."
+                        id="searchInput" value="{{ old('national_id') }}">
+                        <p class="text-success" id="discount-span"></p>
+                </div>
+
             </div>
             <div class="row my-2 ">
                 <div class="col ">
@@ -66,7 +76,7 @@
                     </div>
 
                 </div>
-                
+
             </div>
             <div class="row my-2">
                 <div class="col">
@@ -120,10 +130,10 @@
                 <div class="col align-content-end">
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="paid">
-                        <label class="form-check-label" for="flexCheckDefault">
                             @php
                                 $currency = config('app.currency');
                             @endphp
+                        <label class="form-check-label" for="flexCheckDefault" id="price">
                             Paid {{ $doctor->price }} {{ $currency }}
                         </label>
                     </div>
@@ -134,4 +144,37 @@
             </div>
         </form>
     </div>
+    <script src="{{ asset('js/jquery-3.7.1.min.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+           
+            $('#searchInput').on('keyup', function() {
+                let query = $(this).val();
+
+                if (query.length > 0) {
+                    $.ajax({
+                        url: "{{ route('patient.discount') }}",
+                        method: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            national_id: query,
+                            doctor_id: "{{ $doctor->id }}"
+                        },
+                        success: function(response) {
+
+                            if (response.status !== 'not-found') {
+                                $('#discount-span').text(response.message);
+                                $('#price').text(response.price+" {{$currency}}")
+                            }else{
+                                $('#discount-span').empty();
+                                $('#price').text("{{$doctor->price}} {{$currency}}")
+                            }
+
+                        },
+
+                    });
+                }
+            });
+        });
+    </script>
 @endsection

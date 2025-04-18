@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\User;
 use App\Models\Employee;
+use App\Models\Role;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -43,10 +45,9 @@ class EmpController extends Controller
             [
                 'name' => ['required', 'min:3'],
                 'email' => ['required', 'email', 'unique:users'],
-                'role' => ['required', Rule::in(['admin', 'super_adimn', 'receptionist', 'nurse', 'security'])],
+                'role' => ['required', Rule::in(DB::table('roles')->pluck('name'))],
                 'password' => ['required', 'min:6', 'confirmed'],
                 'national_id' => ['required', 'min:5'],
-                'salary' => ['required'],
                 'phone' => ['required'],
                 'home_phone' => ['required'],
                 'gender' => ['required', Rule::in(['male', 'female'])],
@@ -75,8 +76,9 @@ class EmpController extends Controller
         $emp->phone = $request->phone;
         $emp->home_phone = $request->home_phone;
         $emp->gender = $request->gender;
+        $emp->role = $request->role;
         $emp->birthDate = $request->birthdate;
-        $emp->salary = (int) $request->salary;
+        $emp->salary = Role::where('name',$request->role)->first()->salary;
         $emp->national_id = $request->national_id;
         $emp->address = $request->address;
         $emp->save();
@@ -109,19 +111,24 @@ class EmpController extends Controller
     public function update(Request $request, string $id)
     {
 
-        $request->validate([
-            "name" => "required|min:2",
-            "email" => "required|email",
-            "role" => "required|min:4",
-            "password" => "nullable|min:6|confirmed",
-            "national_id" => "required",
-            "address" => "required",
-            "salary" => "required",
-            "phone" => "required",
-            "home_phone" => "required",
-            "gender" => "required",
-            "profile" => "image|max:2048|nullable"
-        ]);
+       $validator =  Validator::make(
+            $request->all(),
+            [
+                'name' => ['required', 'min:3'],
+                'email' => ['required', 'email'],
+                'role' => ['required', Rule::in(DB::table('roles')->pluck('name'))],
+                'password' => ['nullable', 'min:6', 'confirmed'],
+                'national_id' => ['required', 'min:5'],
+                'phone' => ['required'],
+                'home_phone' => ['required'],
+                'gender' => ['required', Rule::in(['male', 'female'])],
+                'profile' => ['image', 'max:2048', 'nullable'],
+            ]
+        );
+        if ($validator->fails()) {
+
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
         $emp = Employee::findOrFail($id);
         // user 
@@ -148,7 +155,8 @@ class EmpController extends Controller
         $emp->home_phone = $request->home_phone;
         $emp->gender = $request->gender;
         $emp->birthDate = $request->birthdate;
-        $emp->salary = (int) $request->salary;
+        $emp->role = $request->role;
+        $emp->salary = Role::where('name',$request->role)->first()->salary;
         $emp->national_id = $request->national_id;
         $emp->address = $request->address;
         $emp->save();
@@ -224,5 +232,24 @@ class EmpController extends Controller
         }
 
         return response()->json($employees);
+    }
+    // salaries
+    public function salaries() {
+        $total=DB::table('employees')->sum('salary')+DB::table('doctors')->sum('salary');
+        $counts=[];
+        $roles=Role::all();
+        foreach ($roles as $role) {
+            $count=DB::table('users')->where('role',$role->name)->count();
+            $counts[$role->name]=[
+                'count'=>$count,
+                'default'=>$role->salary,
+                'incentives'=>$role->incentives,
+                'total'=>$count*$role->salary +$count*$role->incentives
+            ];
+        }
+        $doctors_salary=DB::table('doctors')->sum('salary');
+        $doctors=DB::table('doctors')->count();
+        
+        return view('employees.salaries',compact('total','counts','doctors','doctors_salary'));
     }
 }

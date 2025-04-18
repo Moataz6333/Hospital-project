@@ -31,6 +31,8 @@ class ClinicWithDoctorsResourse extends JsonResource
             'id'=>$this->id,
             'name'=>$this->name,
             'place'=>$this->place,
+            'description'=>$this->description,
+            'photo'=>$this->photo ? Storage::disk('clinics')->url($this->photo) : "",
             'doctors'=>$doctors,
         ];
     }

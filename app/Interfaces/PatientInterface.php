@@ -8,4 +8,5 @@ interface PatientInterface{
     public function updateAppointment($appointment,$data);
     public function archive($doctor,$current);
     public function cancel($appointment,$canceldBy);
+    public function price($patient ,$doctor,$price);
 }

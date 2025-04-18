@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Interfaces\BalanceInterface;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
 use App\Models\Clinic;
@@ -11,8 +12,9 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use App\Interfaces\PatientInterface;
 use App\Interfaces\PaymentInterface;
-use App\Models\Donation;
+use App\Models\Discount;
 use App\Models\Hospital;
+use App\Models\Patient;
 use App\Models\Transaction;
 
 date_default_timezone_set('Africa/Cairo');
@@ -23,7 +25,8 @@ class ReciptionController extends Controller
     protected $patientService;
     protected $paymentService;
     public function __construct(PatientInterface $patientService,
-    PaymentInterface $paymentService)
+    PaymentInterface $paymentService,
+    )
     {
         $this->patientService = $patientService;
         $this->paymentService = $paymentService;
@@ -107,6 +110,7 @@ class ReciptionController extends Controller
                 'age' => ['required'],
                 'gender' => ['required', Rule::in(['male', 'female'])],
                 'payment_method' => ['required', Rule::in(['cash', 'online'])],
+                'national_id' => ['nullable','max:50'],
                 'paid' => 'nullable',
                 
             ]
@@ -188,6 +192,7 @@ class ReciptionController extends Controller
                 'age' => ['required'],
                 'gender' => ['required', Rule::in(['male', 'female'])],
                 'payment_method' => ['required', Rule::in(['cash', 'online'])],
+                'national_id' => ['nullable','max:50'],
                 'paid' => 'nullable',
                 
             ]
@@ -234,6 +239,46 @@ class ReciptionController extends Controller
         $appointment->save();
         $transaction->delete();
         return redirect()->back()->with('success','transaction deleted successfully');
+    }
+
+    public function hasDiscount(Request $request) {
+        $national_id =$request->national_id;
+        $doctor_id=$request->doctor_id;
+        $patient =Patient::where('national_id',$national_id)->first();
+        $doctor =Doctor::findOrFail($doctor_id);
+        if($patient){
+        $appointments = count($patient->appointments->where('doctor_id',$doctor->id));
+        $discounts =Discount::all();
+        $patient_discount=0;
+        $discount_name="";
+        foreach ($discounts as $discount) {
+            if (str_contains($discount->name,'Appointments')) {
+                $number = (int) explode('-',$discount->name)[0];
+                if($appointments >= $number){
+                    $patient_discount=$discount->discount;
+                    $discount_name =$discount->name;
+                }
+            }
+        }
+        if ($patient->donation) {
+            $patient_discount=Discount::where('name','donator')->first()->discount;
+            $discount_name ='Donator';
+        }
+        if ($patient_discount) {
+            $price = $doctor->price - ($patient_discount*$doctor->price);
+            $data=[
+                'status'=>'found',
+                'message'=>"this patient has a $discount_name discount",
+                'price'=>$price
+            ];
+            return response()->json($data,200);
+        }
+        return response()->json(['status'=>'not-found',],200);
+
+        }else{
+        return response()->json(['status'=>'not-found',],200);
+           
+        }
     }
  
    

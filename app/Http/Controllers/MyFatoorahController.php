@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Interfaces\BalanceInterface;
+use App\Interfaces\PatientInterface;
 use App\Models\Appointment;
 use App\Models\Donation;
 use App\Models\Transaction;
@@ -28,13 +30,18 @@ class MyFatoorahController extends Controller
     /**
      * Initiate MyFatoorah Configuration
      */
-    public function __construct()
+    protected $balanceService;
+    protected $patientService;
+    public function __construct(BalanceInterface $balanceService,
+    PatientInterface $patientService)
     {
         $this->mfConfig = [
             'apiKey'      => config('myfatoorah.api_key'),
             'isTest'      => config('myfatoorah.test_mode'),
             'countryCode' => config('myfatoorah.country_iso'),
         ];
+        $this->balanceService =$balanceService;
+        $this->patientService =$patientService;
     }
    
 
@@ -174,6 +181,7 @@ class MyFatoorahController extends Controller
                         'PaymentId' => $data->InvoiceTransactions[0]->PaymentId,
                         'CardNumber' => str_repeat("x", strlen($data->InvoiceTransactions[0]->CardNumber) - 4) . substr($data->InvoiceTransactions[0]->CardNumber, -4),
                     ]);
+                    $this->balanceService->increase((double) $data->InvoiceValue);
                     DB::commit();
                     // return $response;
                     if ($transaction->appointment->registration_method == 'reception') {
@@ -203,6 +211,7 @@ class MyFatoorahController extends Controller
                         'PaymentId' => $data->InvoiceTransactions[0]->PaymentId,
                         'CardNumber' => str_repeat("x", strlen($data->InvoiceTransactions[0]->CardNumber) - 4) . substr($data->InvoiceTransactions[0]->CardNumber, -4),
                     ]);
+                    $this->balanceService->increase((double) $data->InvoiceValue);
                     DB::commit();
                     // return $response;
                     if ($transaction->donation->registration_method == 'reception') {
@@ -311,7 +320,7 @@ class MyFatoorahController extends Controller
             'name' => $appointment->patient->name,
             'phone' => str_starts_with($appointment->patient->phone, "0") ? ltrim($appointment->patient->phone, '0') : $appointment->patient->phone,
             'patient_id' => $appointment->patient->id,
-            'total'    => (float) $appointment->doctor->price,
+            'total'    => (float)  $this->patientService->price($appointment->patient,$appointment->doctor,$appointment->doctor->price),
             'currency' => config('app.currency', 'EGP'),
             'type'=>'appointment'
         ];

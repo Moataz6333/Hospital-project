@@ -17,3 +17,6 @@ use Illuminate\Support\Facades\Broadcast;
 Broadcast::channel('private-doctor.{doctorId}', function ($user, $doctorId) {
     return (int) $user->id === (int) $doctorId;
 });
+Broadcast::channel('private-balanceUpdated', function ($user) {
+    return true;
+});

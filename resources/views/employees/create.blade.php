@@ -122,13 +122,7 @@
                 @enderror
                 <input type="text" name="address" class="form-control" required>
             </div>
-            <div class="col-5">
-                <label for="salary" class="form-label">salary</label>
-                @error('salary')
-                    <p class="text-danger "><small>{{ $message }}</small> </p>
-                @enderror
-                <input type="text" name="salary" class="form-control" required>
-            </div>
+           
             <div class="col">
                 <label for="formFile" class="form-label">Profile Photo</label>
                 <input class="form-control" type="file" id="formFile" name="profile">

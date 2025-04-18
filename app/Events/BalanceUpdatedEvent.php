@@ -7,30 +7,33 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use App\Models\Appointment;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 
-class NewAppointmentEvent implements ShouldBroadcastNow
+class BalanceUpdatedEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $appointment;
-
-    public function __construct(Appointment $appointment)
+    /**
+     * Create a new event instance.
+     */
+    public function __construct()
     {
-        $this->appointment = $appointment->load('patient');
+        //
     }
 
-   
+    /**
+     * Get the channels the event should broadcast on.
+     *
+     * @return array<int, \Illuminate\Broadcasting\Channel>
+     */
     public function broadcastOn()
     {
-        return new PrivateChannel('private-doctor.' . $this->appointment->doctor->user_id);
+        return new PrivateChannel('private-balanceUpdated');
     }
-
     public function broadcastAs()
     {
-        return 'new-appointment';
+        return 'new-balance';
     }
 }

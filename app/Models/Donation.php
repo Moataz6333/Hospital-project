@@ -4,13 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Patient;
 
 class Donation extends Model
 {
     use HasFactory;
     protected $fillable =[
-        'name',
-        'phone',
+        'patient_id',
         'national_id',
         'value',
         'currency',
@@ -20,5 +20,8 @@ class Donation extends Model
     ];
     public function transaction() {
         return $this->hasOne(Transaction::class,'donation_id');
+    }
+    public function patient() {
+        return $this->belongsTo(Patient::class);
     }
 }

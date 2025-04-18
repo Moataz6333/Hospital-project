@@ -18,9 +18,10 @@
         <form action="{{ route('employees.search') }}" method="POST" class="row g-3 justify-content-center">
             @csrf
             <div class="col-7">
-                <input type="text" id="searchInput" class="form-control" required placeholder="Search by name" name="name">
+                <input type="text" id="searchInput" class="form-control" required placeholder="Search by name"
+                    name="name">
             </div>
-            
+
         </form>
     </div>
     <table class="table table-striped table-hover">
@@ -56,51 +57,51 @@
 
         </tbody>
     </table>
-   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $(document).ready(function() {
-        $('#searchInput').on('keyup', function() {
-            let query = $(this).val();
+    <script src="{{asset('js/jquery-3.7.1.min.js')}}"></script>
+    <script>
+        $(document).ready(function() {
+            $('#searchInput').on('keyup', function() {
+                let query = $(this).val();
 
-            if (query.length > 0) {
-                $.ajax({
-                    url: "{{ route('employees.search') }}",
-                    method: "POST",
-                    data: {
-                        _token: "{{ csrf_token() }}",
-                        name: query
-                    },
-                    success: function(response) {
-                        updateTable(response);
-                    }
-                });
-            } else {
-                // Fetch all employees when search is cleared
-                $.ajax({
-                    url: "{{ route('employees.json') }}",
-                    method: "GET",
-                    success: function(response) {
-                        updateTable(response);
-                    }
-                });
-            }
-        });
+                if (query.length > 0) {
+                    $.ajax({
+                        url: "{{ route('employees.search') }}",
+                        method: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            name: query
+                        },
+                        success: function(response) {
+                            updateTable(response);
+                        }
+                    });
+                } else {
+                    // Fetch all employees when search is cleared
+                    $.ajax({
+                        url: "{{ route('employees.json') }}",
+                        method: "GET",
+                        success: function(response) {
+                            updateTable(response);
+                        }
+                    });
+                }
+            });
 
-        function updateTable(employees) {
-            let tbody = $('#employeeTable');
-            tbody.empty(); // Clear existing rows
+            function updateTable(employees) {
+                let tbody = $('#employeeTable');
+                tbody.empty(); // Clear existing rows
 
-            if (employees.length === 0) {
-                tbody.append('<tr><td colspan="6" class="text-center">No employees found</td></tr>');
-                return;
-            }
+                if (employees.length === 0) {
+                    tbody.append('<tr><td colspan="6" class="text-center">No employees found</td></tr>');
+                    return;
+                }
 
-            employees.forEach(function(emp) {
-                let imageUrl = emp.profile ?
-                    "{{ Storage::disk('employees')->url('') }}" + emp.profile :
-                    "{{ asset('storage/profile.jfif') }}";
+                employees.forEach(function(emp) {
+                    let imageUrl = emp.profile ?
+                        "{{ Storage::disk('employees')->url('') }}" + emp.profile :
+                        "{{ asset('storage/profile.jfif') }}";
 
-                let row = `
+                    let row = `
                 <tr>
                     <td><div class="small-profile"><img src="${imageUrl}" alt=""></div></td>
                     <td>${emp.user.name}</td>
@@ -110,11 +111,9 @@
                     <td><a href="/employees/${emp.id}" class="btn btn-primary">Show</a></td>
                 </tr>
             `;
-                tbody.append(row);
-            });
-        }
-    });
-</script>
-
-
+                    tbody.append(row);
+                });
+            }
+        });
+    </script>
 @endsection

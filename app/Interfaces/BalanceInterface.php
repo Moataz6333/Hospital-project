@@ -7,4 +7,5 @@ interface BalanceInterface {
     public function getTransactions();
     public function getCash();
     public function getSalaries();
+    public function increase($amount);
 }

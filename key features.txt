@@ -9,3 +9,6 @@ Key Featured
 * pdf export
 * balance repots
 * api if needed
+
+// if the patient has 5 appointments , he will get 5% off
+// if the patient has 10 appointments , he will get 10% off

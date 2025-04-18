@@ -57,7 +57,7 @@
         </div>
 
         <div class="row">
-            <pre> <b>Customer Name:</b>   {{ $donation->name }}          <b>Customer Phone:</b>  {{ $donation->phone }}        <b>National id :</b>  {{ $donation->national_id }}  </pre>
+            <pre> <b>Customer Name:</b>   {{ $donation->patient->name }}          <b>Customer Phone:</b>  {{ $donation->patient->phone }}        <b>National id :</b>  {{ $donation->patient->national_id }}  </pre>
         </div>
 
         <div class="row">

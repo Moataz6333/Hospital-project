@@ -38,7 +38,7 @@
                         <p class="text-danger "><small>{{ $message }}</small> </p>
                     @enderror
                     <input type="text" name="name" class="form-control" required placeholder="patient Name..."
-                        value="{{ $donation->name }}">
+                        value="{{ $donation->patient->name }}">
                 </div>
                 <div class="col">
                     <label for="phone" class="form-label">Phone</label>
@@ -46,7 +46,7 @@
                         <p class="text-danger "><small>{{ $message }}</small> </p>
                     @enderror
                     <input type="text" class="form-control" name="phone" placeholder="patient phone ..."
-                        value="{{ $donation->phone }}">
+                        value="{{ $donation->patient->phone }}">
                 </div>
                 <div class="col">
                     <label for="phone" class="form-label">National id</label>
@@ -54,7 +54,7 @@
                         <p class="text-danger "><small>{{ $message }}</small> </p>
                     @enderror
                     <input type="text" class="form-control" name="national_id" placeholder="National id  ..."
-                        value="{{ $donation->national_id }}">
+                        value="{{ $donation->patient->national_id }}">
                 </div>
 
             </div>

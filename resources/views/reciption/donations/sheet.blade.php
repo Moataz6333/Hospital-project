@@ -77,19 +77,19 @@
             <div>
                 <h4>Customer Name :</h4>
                 <p class="p-text">
-                    {{ $donation->name }}
+                    {{ $donation->patient->name }}
                 </p>
             </div>
             <div>
                 <h4>Customer Phone :</h4>
                 <p class="p-text">
-                    {{ $donation->phone }}
+                    {{ $donation->patient->phone }}
                 </p>
             </div>
             <div>
                 <h4>Customer National id :</h4>
                 <p class="p-text">
-                    {{ $donation->national_id }}
+                    {{ $donation->patient->national_id }}
                 </p>
             </div>
         </div>

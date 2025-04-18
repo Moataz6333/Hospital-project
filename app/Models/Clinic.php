@@ -13,6 +13,8 @@ class Clinic extends Model
     protected $fillable=[
         'name',
         'place',
+        'description',
+        'photo'
         
     ];
     public function doctors(){

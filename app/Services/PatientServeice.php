@@ -3,24 +3,29 @@
 namespace App\Services;
 
 use App\Interfaces\PatientInterface;
+use App\Jobs\BalanceUpdatedJob;
 use App\Models\Patient;
 use App\Models\Appointment;
 use App\Jobs\NewAppointmentJob;
+use App\Models\Discount;
 use App\Models\Hospital;
 
 class patientServeice implements PatientInterface
 {
-
-
+    
     public function register_Cash($data, $doctor, $registration_method)
     {
 
-        $patient = new Patient();
-        $patient->name = $data['name'];
-        $patient->phone = $data['phone'];
-        $patient->gender = $data['gender'];
-        $patient->age = (int) $data['age'];
-        $patient->save();
+        $patient = Patient::firstOrCreate([
+            'national_id'=>$data['national_id']
+        ],[
+            'name'=>$data['name'],
+            'phone'=>$data['phone'],
+            'gender'=>$data['gender'],
+            'name'=>$data['name'],
+            'age'=>(int)$data['age'],
+        ]);
+       
         $appointment = new Appointment();
         $appointment->patient_id = $patient->id;
         $appointment->doctor_id = $doctor->id;
@@ -30,10 +35,12 @@ class patientServeice implements PatientInterface
         $appointment->registration_method = $registration_method;
         if ($registration_method == "reception" && key_exists("paid", $data)) {
             $appointment->paid = true;
-            Hospital::first()->increaseBalance($appointment->doctor->price);
+            Hospital::first()->increaseBalance($this->price($patient,$appointment->doctor,$appointment->doctor->price));
+            BalanceUpdatedJob::dispatch();
         }
         $appointment->save();
         NewAppointmentJob::dispatch($appointment);
+       
         return $appointment;
     }
     public function register_Online($data, $doctor, $registration_method)
@@ -43,6 +50,7 @@ class patientServeice implements PatientInterface
         $patient->name = $data['name'];
         $patient->phone = $data['phone'];
         $patient->gender = $data['gender'];
+        $patient->national_id = $data['national_id'];
         $patient->age = (int) $data['age'];
         $patient->save();
         $appointment = new Appointment();
@@ -64,6 +72,7 @@ class patientServeice implements PatientInterface
         $patient->name = $data['name'];
         $patient->phone = $data['phone'];
         $patient->gender = $data['gender'];
+        $patient->national_id = $data['national_id'];
         $patient->age = (int) $data['age'];
         $patient->save();
         $appointment->date = $data['date'];
@@ -114,4 +123,25 @@ class patientServeice implements PatientInterface
         }
         $appointment->save();
     }
+    public function price($patient ,$doctor,$price) {
+        
+        $appointments = count($patient->appointments->where('doctor_id',$doctor->id));
+        $discounts =Discount::all();
+        $patient_discount=0;
+        foreach ($discounts as $discount) {
+            if (str_contains($discount->name,'Appointments')) {
+                $number = (int) explode('-',$discount->name)[0];
+                if($appointments >= $number){
+                    $patient_discount=$discount->discount;
+                }
+            }
+        }
+        // if donation
+        if ($patient->donation) {
+            $patient_discount=Discount::where('name','donator')->first()->discount;
+        }
+        $price = $price - ($patient_discount*$price);
+        return $price;
+    }
+
 }

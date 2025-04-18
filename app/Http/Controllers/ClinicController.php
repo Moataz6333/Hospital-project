@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Clinic;
-use App\Models\TimeTable;
+use Illuminate\Support\Facades\Storage;
 
 class ClinicController extends Controller
 {
@@ -36,13 +36,7 @@ class ClinicController extends Controller
 
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+ 
 
     /**
      * Show the form for editing the specified resource.
@@ -62,14 +56,23 @@ class ClinicController extends Controller
         $request->validate([
             "name"=>"required|min:2",
             "floor"=>"required|min:1",
+            "description"=>"nullable|max:255",
+            "photo"=>"nullable"
         ]);
 
         $clinic =Clinic::findOrFail($id);
 
         $clinic->update([
             "name"=>$request->name,
-            "place"=>$request->floor
+            "place"=>$request->floor,
+            "description"=>$request->description,
         ]);
+        if ($request->hasFile('photo')) {
+
+            $photo =  Storage::disk('clinics')->put('/', $request->file('photo'));
+            $clinic->photo = $photo;
+            $clinic->save();
+        }
         
         return redirect()->back()->with('success','clinic updated successfully!');
 

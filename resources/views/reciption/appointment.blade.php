@@ -50,6 +50,14 @@
                     <input type="text" class="form-control" name="phone" placeholder="patient phone ..."
                         value="{{ $appointment->patient->phone }}">
                 </div>
+                <div class="col">
+                    <label for="national_id" class="form-label">National id</label>
+                    @error('national_id')
+                        <p class="text-danger "><small>{{ $message }}</small> </p>
+                    @enderror
+                    <input type="text" class="form-control" name="national_id" placeholder="Nationl id (op) ..."
+                        value="{{ $appointment->patient->national_id }}">
+                </div>
 
             </div>
             <div class="row my-2 ">
@@ -67,13 +75,15 @@
                         <p class="text-danger "><small>{{ $message }}</small> </p>
                     @enderror
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="gender" value="male" @if( $appointment->patient->gender == "male") checked @endif>
+                        <input class="form-check-input" type="radio" name="gender" value="male"
+                            @if ($appointment->patient->gender == 'male') checked @endif>
                         <label class="form-check-label" for="gender">
                             Male
                         </label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="gender" value="female" @if( $appointment->patient->gender == "female") checked @endif>
+                        <input class="form-check-input" type="radio" name="gender" value="female"
+                            @if ($appointment->patient->gender == 'female') checked @endif>
                         <label class="form-check-label" for="gender">
                             Female
                         </label>
