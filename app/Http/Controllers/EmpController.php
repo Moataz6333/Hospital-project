@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\User;
 use App\Models\Employee;
+use App\Models\Penalty;
 use App\Models\Role;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -249,7 +250,6 @@ class EmpController extends Controller
         }
         $doctors_salary=DB::table('doctors')->sum('salary');
         $doctors=DB::table('doctors')->count();
-        
         return view('employees.salaries',compact('total','counts','doctors','doctors_salary'));
     }
 }

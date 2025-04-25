@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
+use App\Models\Penalty;
 
 class Employee extends Model
 {
@@ -23,5 +24,8 @@ class Employee extends Model
     ];
     public function user(){
         return $this->belongsTo(User::class);
+    }
+    public function penalty() {
+        return $this->hasOne(Penalty::class);
     }
 }

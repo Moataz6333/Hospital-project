@@ -5,7 +5,7 @@ namespace App\Services;
 
 class DonationService 
 {
-    public function registerOnline($data,$registration_method){
+    public function registerOnline($data,$registeration_method){
        $patient = Patient::firstOrCreate(
             ['national_id' => $data['national_id'] ],
             [
@@ -18,7 +18,7 @@ class DonationService
             'value' => abs((float) $data['value']),
             'currency' => $data['currency'],
             'payment_method' => 'online',
-            'registration_method' => $registration_method,
+            'registeration_method' => $registeration_method,
         ]);
         return $donation;
     }

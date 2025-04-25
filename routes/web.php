@@ -10,6 +10,7 @@ use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\EmpController;
 use App\Http\Controllers\ReciptionController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Broadcast;
 
@@ -45,6 +46,9 @@ Route::middleware(['auth:sanctum', 'admin_only'])->group(function () {
     Route::get('/salaries',[EmpController::class,'salaries'])->name('employees.salaries');
     Route::get('increase/{amount}', [DashboardController::class,'increase']);
     Route::get('total', [DashboardController::class,'total'])->name('total.json');
+    Route::get('weekData/{week}', [DashboardController::class,'getWeek'])->name('week.json');
+    Route::get('/transactions', [DashboardController::class,'transactions'])->name('transactions.index');
+    Route::get('/reports',[ReportController::class,'index'])->name('reports.index');
 });
 
 // reciptionist

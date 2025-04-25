@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\TimeTable;
 use App\Models\Clinic;
 use App\Models\User;
+use App\Models\Penalty;
 use App\Models\Appointment;
 
 class Doctor extends Model
@@ -42,5 +43,8 @@ class Doctor extends Model
     }
     public function appointments()  {
         return $this->hasMany(Appointment::class);
+    }
+    public function penalty()  {
+        return $this->hasOne(Penalty::class);
     }
 }

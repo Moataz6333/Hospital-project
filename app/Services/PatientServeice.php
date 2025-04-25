@@ -35,7 +35,9 @@ class patientServeice implements PatientInterface
         $appointment->registration_method = $registration_method;
         if ($registration_method == "reception" && key_exists("paid", $data)) {
             $appointment->paid = true;
-            Hospital::first()->increaseBalance($this->price($patient,$appointment->doctor,$appointment->doctor->price));
+            $amount=$this->price($patient,$appointment->doctor,$appointment->doctor->price);
+            $appointment->amount_paid = $amount;
+            Hospital::first()->increaseBalance($amount);
             BalanceUpdatedJob::dispatch();
         }
         $appointment->save();

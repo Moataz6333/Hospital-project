@@ -2,8 +2,9 @@
 @section('title')Employees
 @endsection
 @section('content')
-<div class="my-3 w-100 d-flex">
+<div class="my-3 w-100 d-flex justify-content-between">
     <a href="{{route('employees.index')}}" class="btn btn-dark"><span data-feather="arrow-left"></span></a>
+
 </div>
 @if (session('success'))
                 

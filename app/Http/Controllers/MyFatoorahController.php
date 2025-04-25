@@ -166,6 +166,7 @@ class MyFatoorahController extends Controller
                     DB::beginTransaction();
                     $appointment = Appointment::findOrFail($data->CustomerReference)->load(['patient', 'doctor']);
                     $appointment->paid = true;
+                    $appointment->amount_paid = (double) $data->InvoiceValue;
                     $appointment->save();
                     // save the Transaction
                     $transaction  = Transaction::create([
@@ -316,14 +317,20 @@ class MyFatoorahController extends Controller
     private function getTestOrderData($orderId)
     {
         $appointment = Appointment::findOrFail($orderId);
-        return [
-            'name' => $appointment->patient->name,
-            'phone' => str_starts_with($appointment->patient->phone, "0") ? ltrim($appointment->patient->phone, '0') : $appointment->patient->phone,
-            'patient_id' => $appointment->patient->id,
-            'total'    => (float)  $this->patientService->price($appointment->patient,$appointment->doctor,$appointment->doctor->price),
-            'currency' => config('app.currency', 'EGP'),
-            'type'=>'appointment'
-        ];
+        if ($appointment->paid) {
+           abort(404);
+        } else {
+            return [
+                'name' => $appointment->patient->name,
+                'phone' => str_starts_with($appointment->patient->phone, "0") ? ltrim($appointment->patient->phone, '0') : $appointment->patient->phone,
+                'patient_id' => $appointment->patient->id,
+                'total'    => (float)  $this->patientService->price($appointment->patient,$appointment->doctor,$appointment->doctor->price),
+                'currency' => config('app.currency', 'EGP'),
+                'type'=>'appointment'
+            ];
+        }
+        
+      
     }
     private function getDonationData($orderId){
         $donation =Donation::findOrFail($orderId);

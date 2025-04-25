@@ -17,12 +17,13 @@ class myfatoorahPaymentService  implements PaymentInterface
         }
     }
     public function donate($donation) {
+     
         if($donation->registeration_method == 'reception'){
 
             return redirect("myfatoorah/checkout?did={$donation->id}");
         }else{
             return response()->json([
-                "message" => "appointment created",
+                "message" => "donation created",
                 "link" => env("APP_URL") . "/myfatoorah/checkout?did={$donation->id}"
             ], 200);
         }

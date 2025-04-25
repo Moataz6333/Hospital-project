@@ -16,7 +16,7 @@
     {{-- total --}}
     <div class="header border border-info rounded p-3">
         <h2>
-            The Total number of Salaries : <u> {{ $total }}</u> {{ config('app.currency') }}
+            The Total number of Salaries : <u> {{ $total + $doctors_salary }}</u> {{ config('app.currency') }}
         </h2>
     </div>
 
@@ -24,9 +24,9 @@
 
     {{-- Employees salary --}}
     <div class="border  rounded my-3 ">
-        <h2 class="m-3 mt-4">Employees Roles
+        <h2 class="m-3 mt-4">Employees Roles <u>{{$total}}</u> {{ config('app.currency') }}
             @can('isSuperAdmin')
-                <a href="{{ route('roles.index') }}" class="btn btn-primary">edit</a>
+                <a href="{{ route('roles.index') }}" class="btn btn-primary px-2">edit</a>
             @endcan
         </h2>
         <div class="d-flex justify-content-evenly p-3">

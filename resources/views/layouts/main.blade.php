@@ -59,42 +59,26 @@
                 <div class="position-sticky pt-3">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="{{ route('dashboard') }}">
-                                <span data-feather="align-justify"></span>
+                            <a class="nav-link @if(Route::is('dashboard')) active @endif" aria-current="page" href="{{ route('dashboard') }}">
+                                <span data-feather="hash"></span>
                                 Dashboard
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link " href="{{ route('hospital') }}">
+                            <a class="nav-link @if(Route::is('hospital')) active @endif " href="{{ route('hospital') }}">
                                 <span data-feather="home"></span>
                                 Hospital
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="collapse" href="#clinics" role="button"
-                                aria-expanded="false" aria-controls="clinics">
+                            <a class="nav-link @if(Route::is('clinics.index') ||Route::is('clinics.edit') ) active @endif " href="{{ route('clinics.index') }}">
                                 <span data-feather="layers"></span>
                                 Clinics
                             </a>
-                            <div class="collapse" id="clinics">
-                                <ul class="nav flex-column ">
-                                    <li class="nav-item ms-2">
-                                        <a class="nav-link" href="{{ route('clinics.index') }}">
-                                            <span data-feather="hash"></span>
-                                            all clinics
-                                        </a>
-                                    </li>
-                                    <li class="nav-item ms-2">
-                                        <a class="nav-link" href="#">
-                                            <span data-feather="plus"></span>
-                                            add clinic
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
                         </li>
+                       
                         <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="collapse" href="#doctors" role="button"
+                            <a class="nav-link @if(Route::is('doctors.index') ||Route::is('doctors.create') ||Route::is('doctors.edit')  ||Route::is('doctors.timeTable')  ||Route::is('doctors.archive') ) active @endif" data-bs-toggle="collapse" href="#doctors" role="button"
                                 aria-expanded="false" aria-controls="doctors">
                                 <span data-feather="user"></span>
                                 Doctors
@@ -117,7 +101,7 @@
                             </div>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="collapse" href="#emps" role="button"
+                            <a class="nav-link @if(Route::is('employees.index') ||Route::is('employees.show') ||Route::is('employees.create') ||Route::is('employees.salaries') ) active @endif" data-bs-toggle="collapse" href="#emps" role="button"
                                 aria-expanded="false" aria-controls="doctors">
                                 <span data-feather="users"></span>
                                 Employees
@@ -147,7 +131,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link @if(Route::is('reports.index')) active @endif" href="{{route('reports.index')}}">
                                 <span data-feather="bar-chart-2"></span>
                                 Reports
                             </a>

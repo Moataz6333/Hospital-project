@@ -20,6 +20,8 @@ class Appointment extends Model
         'verified',
         'status',
         'canceled_by',
+        'amount_paid',
+        
     ];
 
     public function patient(){

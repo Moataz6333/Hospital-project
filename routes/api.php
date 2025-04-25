@@ -17,5 +17,7 @@ Route::get('/doctor/{id}',[HospitalController::class,'doctor'] );
 Route::post('/appointment/create', [HospitalController::class,'createAppointment']);
 //donation
 Route::post('/donate', [HospitalController::class,'donate']);
+// has discount
+Route::post('/hasDiscount', [HospitalController::class,'hasDiscount']);
 
 
