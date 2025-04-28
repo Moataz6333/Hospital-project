@@ -77,10 +77,11 @@
             <script>
                 var appointmentId = "{{ request('oid') }}"; // Getting 'oid' from the request
                 var donationId = "{{ request('did') }}"; // Getting 'oid' from the request
+                var subscriberId = "{{ request('ssid') }}"; // Getting 'oid' from the request
             </script>
             <script>
                 function mfCallback(response) {
-                    window.location.href = "{{url('myfatoorah')}}?sid=" + response.sessionId + "&oid=" + appointmentId +"&did=" + donationId;
+                    window.location.href = "{{url('myfatoorah')}}?sid=" + response.sessionId + "&oid=" + appointmentId +"&did=" + donationId+ "&ssid="+subscriberId;
                 }
             </script>
 

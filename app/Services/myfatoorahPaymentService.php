@@ -28,6 +28,17 @@ class myfatoorahPaymentService  implements PaymentInterface
             ], 200);
         }
     }
+    public function subscribe($subscriber){
+        if($subscriber->registeration_method == 'reception'){
+
+            return redirect("myfatoorah/checkout?ssid={$subscriber->id}");
+        }else{
+            return response()->json([
+                "message" => "subscriber created",
+                "link" => env("APP_URL") . "/myfatoorah/checkout?ssid={$subscriber->id}"
+            ], 200);
+        }
+    }
     
 }
 

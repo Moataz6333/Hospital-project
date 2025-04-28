@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Hospital;
 use App\Models\Transaction;
+use App\Models\Subscriber;
 use Mpdf\Mpdf;
 use Illuminate\Support\Facades\View;
 
@@ -83,6 +84,39 @@ class HospitalController extends Controller
             abort(404);
         }
     }
-    // balance
+    public function subscribtionSheet($id)  {
+        $subscriber =Subscriber::where('subscribtion_id',$id)->first();
+        if ($subscriber) {
+            $subscriber->load(['patient','plan']);
+            return view('admin.plans.printsheet',compact('subscriber'));
+        } else {
+            abort(404);
+        }
+        
+    }
+    public function exportSubscribtionSheet($id)  {
+        $subscriber =Subscriber::where('subscribtion_id',$id)->first();
+        if ($subscriber) {
+            $subscriber->load(['patient','plan','transaction']);
+            $html = View::make('admin.plans.export', compact('subscriber'))->render();
+            // return view('exportSheetTemplate',compact('transaction'));
+            $mpdf = new Mpdf([
+                'mode' => 'utf-8',
+                'format' => 'A4',
+                'default_font' => 'dejavusans', // Arabic font
+                'default_font_size' => 12,
+                'autoScriptToLang' => true,
+                'autoLangToFont' => true,
+            ]);
+    
+            $mpdf->WriteHTML($html);
+            $name=$subscriber->patient->name;
+            return response($mpdf->Output("$name.pdf", 'D'))
+            ->header('Content-Type', 'application/pdf');
+        } else {
+            abort(404);
+        }
+        
+    }
     
 }

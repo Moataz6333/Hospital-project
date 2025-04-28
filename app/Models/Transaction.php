@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Patient;
+use App\Models\Donation;
+use App\Models\Subscriber;
 
 class Transaction extends Model
 {
@@ -13,6 +15,7 @@ class Transaction extends Model
         'patient_id',
         'appointment_id',
         'donation_id',
+        'subsciber_id',
         'InvoiceId',
         'InvoiceReference',
         'InvoiceValue',
@@ -31,5 +34,8 @@ class Transaction extends Model
     }
     public function donation()  {
         return $this->belongsTo(Donation::class);
+    }
+    public function subscriber() {
+        return $this->belongsTo(Subscriber::class,'subsciber_id');
     }
 }

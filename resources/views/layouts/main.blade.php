@@ -13,7 +13,7 @@
     </title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/dashboard/">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 
     <!-- Bootstrap core CSS -->
@@ -64,19 +64,55 @@
                                 Dashboard
                             </a>
                         </li>
+                        {{-- hsopital --}}
                         <li class="nav-item">
-                            <a class="nav-link @if(Route::is('hospital')) active @endif " href="{{ route('hospital') }}">
+                            <a class="nav-link @if(Route::is('hospital') ) active @endif "  data-bs-toggle="collapse" href="#hospital" role="button"
+                                aria-expanded="false" aria-controls="hospital">
                                 <span data-feather="home"></span>
                                 Hospital
                             </a>
+                            <div class="collapse" id="hospital">
+                                <ul class="nav flex-column ">
+                                    <li class="nav-item ms-2">
+                                        <a class="nav-link" href="{{ route('hospital') }}">
+                                            <span data-feather="hash"></span>
+                                            Details
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </li>
+                        {{-- plans --}}
+                        <li class="nav-item">
+                            <a class="nav-link @if(Route::is('plans.index') || Route::is('plans.create') ) active @endif "  data-bs-toggle="collapse" href="#plans" role="button"
+                                aria-expanded="false" aria-controls="plans">
+                                <span data-feather="shopping-cart"></span>
+                                Plans
+                            </a>
+                            <div class="collapse" id="plans">
+                                <ul class="nav flex-column ">
+                                    <li class="nav-item ms-2">
+                                        <a class="nav-link" href="{{ route('plans.index') }}">
+                                            <span data-feather="hash"></span>
+                                           all Plans
+                                        </a>
+                                    </li>
+                                        <a class="nav-link ms-2" href="{{ route('plans.create') }}">
+                                            <span data-feather="user-plus"></span>
+                                           add Plan
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        {{-- clinics --}}
                         <li class="nav-item">
                             <a class="nav-link @if(Route::is('clinics.index') ||Route::is('clinics.edit') ) active @endif " href="{{ route('clinics.index') }}">
                                 <span data-feather="layers"></span>
                                 Clinics
                             </a>
                         </li>
-                       
+                       {{-- doctors --}}
                         <li class="nav-item">
                             <a class="nav-link @if(Route::is('doctors.index') ||Route::is('doctors.create') ||Route::is('doctors.edit')  ||Route::is('doctors.timeTable')  ||Route::is('doctors.archive') ) active @endif" data-bs-toggle="collapse" href="#doctors" role="button"
                                 aria-expanded="false" aria-controls="doctors">
@@ -100,6 +136,7 @@
                                 </ul>
                             </div>
                         </li>
+                        {{-- employees --}}
                         <li class="nav-item">
                             <a class="nav-link @if(Route::is('employees.index') ||Route::is('employees.show') ||Route::is('employees.create') ||Route::is('employees.salaries') ) active @endif" data-bs-toggle="collapse" href="#emps" role="button"
                                 aria-expanded="false" aria-controls="doctors">
@@ -129,7 +166,7 @@
                                 </ul>
                             </div>
                         </li>
-
+                        {{-- reports --}}
                         <li class="nav-item">
                             <a class="nav-link @if(Route::is('reports.index')) active @endif" href="{{route('reports.index')}}">
                                 <span data-feather="bar-chart-2"></span>

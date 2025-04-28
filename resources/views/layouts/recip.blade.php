@@ -12,6 +12,7 @@
     </title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/dashboard/">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 
 
@@ -86,7 +87,12 @@
                                 </ul>
                             </div>
                         </li>
-                       
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="{{route('reception.plans')}}">
+                                <span data-feather="shopping-cart"></span>
+                                Plans
+                            </a>
+                        </li>
 
                     </ul>
                     <hr>

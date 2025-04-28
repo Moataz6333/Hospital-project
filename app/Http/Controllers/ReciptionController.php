@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Interfaces\BalanceInterface;
+use App\Http\Requests\PlanSubscriptionRequest;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
 use App\Models\Clinic;
@@ -13,9 +13,11 @@ use Illuminate\Validation\Rule;
 use App\Interfaces\PatientInterface;
 use App\Interfaces\PaymentInterface;
 use App\Models\Discount;
-use App\Models\Hospital;
 use App\Models\Patient;
+use App\Models\Plan;
+use App\Models\Subscriber;
 use App\Models\Transaction;
+use App\Services\PlanService;
 
 date_default_timezone_set('Africa/Cairo');
 
@@ -24,12 +26,15 @@ class ReciptionController extends Controller
 {
     protected $patientService;
     protected $paymentService;
+    protected $planService;
     public function __construct(PatientInterface $patientService,
     PaymentInterface $paymentService,
+    PlanService $planService
     )
     {
         $this->patientService = $patientService;
         $this->paymentService = $paymentService;
+        $this->planService =$planService;
     }
     public function index()
     {
@@ -240,7 +245,7 @@ class ReciptionController extends Controller
         $transaction->delete();
         return redirect()->back()->with('success','transaction deleted successfully');
     }
-
+    // has discount
     public function hasDiscount(Request $request) {
         $national_id =$request->national_id;
         $doctor_id=$request->doctor_id;
@@ -280,6 +285,46 @@ class ReciptionController extends Controller
            
         }
     }
+    // plans view
+    public function plans()  {
+     $plans=Plan::all();
+     return view('reciption.plans.index',compact('plans'));
+    }
+    public function registerPlan($id) {
+        $plan =Plan::findOrFail($id);
+        return view('reciption.plans.register',compact('plan'));
+    }
+    public function subscribeToPlan(PlanSubscriptionRequest $request,$id) {
+        $plan=Plan::findOrFail($id);
+        $subscriber =$this->planService->register($request->validated(),'reception',$plan);
+        if ($subscriber->payment_method == 'cash') {
+            return redirect()->back()->with('success','customer subscribed successfully!');
+        }elseif($subscriber->payment_method=='online'){
+            return $this->paymentService->subscribe($subscriber);
+        }
+    }
+    public function subscribers($id) {
+        $plan=Plan::findOrFail($id);
+        return view('reciption.plans.subscribers',compact('plan'));
+    }
+    public function subscriber($id) {
+        $subscriber =Subscriber::findOrFail($id)->load('patient');
+        return view('reciption.plans.subscriber',compact('subscriber'));
+    }
+    public function updateSubscriber(PlanSubscriptionRequest $request,$id) {
+        $subscriber =Subscriber::findOrFail($id);
+        $this->planService->update($request->validated(),$subscriber);
+        return redirect()->back()->with('success','customer Updated successfully!');
+
+    }
+    public function destroySubscriber($id) {
+        $subscriber =Subscriber::findOrFail($id);
+        $plan_id =$subscriber->plan_id;
+        $subscriber->delete();
+        return to_route('reception.subscribers',$plan_id)->with('success','subscriber deleted successfully');
+        
+    }
+  
  
    
 }

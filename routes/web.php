@@ -9,6 +9,7 @@ use App\Http\Controllers\ClinicController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\EmpController;
+use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ReciptionController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
@@ -49,6 +50,7 @@ Route::middleware(['auth:sanctum', 'admin_only'])->group(function () {
     Route::get('weekData/{week}', [DashboardController::class,'getWeek'])->name('week.json');
     Route::get('/transactions', [DashboardController::class,'transactions'])->name('transactions.index');
     Route::get('/reports',[ReportController::class,'index'])->name('reports.index');
+    Route::resource('/plans', PlanController::class);
 });
 
 // reciptionist
@@ -71,6 +73,15 @@ Route::middleware(['auth:sanctum', 'receptionist_only'])->group(function () {
     Route::post('/donations/search', [DonationController::class,'search'])->name('donations.search');
     Route::get('/Alldonations', [DonationController::class,'getAllDonations'])->name('donations.json');
     Route::post('/hasDicount', [ReciptionController::class, 'hasDiscount'])->name('patient.discount');
+    Route::get('/reception/plans',[ReciptionController::class, 'plans'] )->name('reception.plans');
+    Route::get('/reception/plan/{id}', [ReciptionController::class,'registerPlan'])->name('plan.form');
+    Route::post('/reception/plan/{id}', [ReciptionController::class,'subscribeToPlan'])->name('plan.subscripe');
+    Route::get('/reception/subscribers/{id}', [ReciptionController::class,'subscribers'])->name('reception.subscribers');
+    Route::get('/reception/subscribers/edit/{id}', [ReciptionController::class,'subscriber'])->name('reception.subscriber');
+    Route::post('/reception/subscribers/edit/{id}', [ReciptionController::class,'updateSubscriber'])->name('reception.subscriber.update');
+    Route::delete('/reception/subscriber/delete/{id}',[ReciptionController::class,'destroySubscriber'])->name('reception.subscriber.destroy');
+
+
     // Route::get('/test',[ReciptionController::class,'test']);
 });
 
@@ -91,6 +102,10 @@ Route::middleware(['auth:sanctum', 'superAdmin_only'])->group(function () {
 // hosptial
 Route::get('/sheet/{id}', [HospitalController::class, 'sheet'])->name('hospital.sheet');
 Route::get('/export/{id}', [HospitalController::class, 'exportSheet'])->name('sheet.download');
+// subscription
+Route::get('/subscribers/sheet/{id}', [HospitalController::class,'subscribtionSheet'])->name('subscriber.sheet');
+Route::get('/subscribers/export/{id}', [HospitalController::class,'exportSubscribtionSheet'])->name('subscriber.sheet.export');
+
 // donation
 Route::get('/donation/sheet/{id}', [DonationController::class,'sheet'])->name('donation.sheet');
 Route::get('/donation/export/{id}', [DonationController::class,'export'])->name('donation.export');

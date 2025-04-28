@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PlanSubscriptionRequest;
 use App\Http\Resources\AppointmentResource;
 use App\Http\Resources\ClinicResourse;
 use App\Http\Resources\ClinicWithDoctorsResourse;
 use App\Http\Resources\DoctorResource;
+use App\Http\Resources\PlanResource;
 use App\Models\Clinic;
 use App\Models\Doctor;
 use App\Models\Hospital;
@@ -17,18 +19,23 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use App\Interfaces\PatientInterface;
 use App\Interfaces\PaymentInterface;
+use App\Models\Plan;
 use App\Services\DonationService;
+use App\Services\PlanService;
 
 class HospitalController extends Controller
 {
     protected $patientService;
     protected $paymentService;
+    protected $planService;
     public function __construct(
         PatientInterface $patientService,
-        PaymentInterface $paymentService
+        PaymentInterface $paymentService,
+        PlanService $planService
     ) {
         $this->patientService = $patientService;
         $this->paymentService = $paymentService;
+        $this->planService = $planService;
     }
     public function Hospital()
     {
@@ -118,7 +125,7 @@ class HospitalController extends Controller
             ], 422);
         }
         $donationService =new DonationService();
-        $donation =$donationService->registerOnline($validator->validated(),'website');
+        $donation =$donationService->registerOnline($validator->validated(),'online');
          return $this->paymentService->donate($donation);
 
     }
@@ -175,5 +182,20 @@ class HospitalController extends Controller
         return response()->json(['status'=>'not-found',],200);
            
         }
+    }
+    // plans
+    public function plans() {
+        return response()->json(PlanResource::collection(Plan::all()),200);
+    }
+    // plan
+    public function plan($id) {
+        $plan = Plan::findOrfail($id);
+        return response()->json(new PlanResource($plan), 200);
+    }
+    // subscriber
+    public function subscribe(PlanSubscriptionRequest $request,$id) {
+        $plan=Plan::findOrFail($id);
+        $subscriber =$this->planService->register_online($request->validated(),$plan);
+      return $this->paymentService->subscribe($subscriber);
     }
 }

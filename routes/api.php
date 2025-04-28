@@ -19,5 +19,10 @@ Route::post('/appointment/create', [HospitalController::class,'createAppointment
 Route::post('/donate', [HospitalController::class,'donate']);
 // has discount
 Route::post('/hasDiscount', [HospitalController::class,'hasDiscount']);
-
+// all plans
+Route::get('/plans',[HospitalController::class,'plans'] );
+// plan with id
+Route::get('/plan/{id}',[HospitalController::class,'plan'] );
+// subscribe to plan
+Route::post('/subscribe/{id}', [HospitalController::class,'subscribe']);
 

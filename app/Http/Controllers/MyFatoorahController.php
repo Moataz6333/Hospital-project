@@ -6,6 +6,7 @@ use App\Interfaces\BalanceInterface;
 use App\Interfaces\PatientInterface;
 use App\Models\Appointment;
 use App\Models\Donation;
+use App\Models\Subscriber;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -77,6 +78,15 @@ class MyFatoorahController extends Controller
                 $payment = $mfObj->getInvoiceURL($curlData, $paymentId, $orderId, $sessionId);
                 // dd($payment);
                 return redirect()->away($payment['invoiceURL']);
+            
+            }elseif(request()->filled('ssid')){
+                $orderId  = request('ssid') ;
+                $curlData = $this->getPayLoadSubscriberData($orderId);
+    
+                $mfObj   = new MyFatoorahPayment($this->mfConfig);
+                $payment = $mfObj->getInvoiceURL($curlData, $paymentId, $orderId, $sessionId);
+                // dd($payment);
+                return redirect()->away($payment['invoiceURL']);
             }
         } catch (Exception $ex) {
             $exMessage = __('from index myfatoorah.' . $ex->getMessage());
@@ -135,6 +145,27 @@ class MyFatoorahController extends Controller
             'CustomerReference'  => $orderId,
             'SourceInfo'         => 'Laravel ' . app()::VERSION . ' - MyFatoorah Package ' . MYFATOORAH_LARAVEL_PACKAGE_VERSION,
             'UserDefinedField'           =>'donation' 
+        ];
+    }
+    private function getPayLoadSubscriberData($orderId = null)
+    {
+        $callbackURL = route('myfatoorah.callback');
+
+        //You can get the data using the order object in your system
+        $order = $this->getSubscriberData($orderId);
+        
+        return [
+            'CustomerName'       => $order['name'],
+            'InvoiceValue'       => $order['total'],
+            'DisplayCurrencyIso' => $order['currency'],
+            'CallBackUrl'        => $callbackURL,
+            'ErrorUrl'           => $callbackURL,
+            'MobileCountryCode'  => '+20',
+            'CustomerMobile'     => $order['phone'],
+            'Language'           => 'en',
+            'CustomerReference'  => $orderId,
+            'SourceInfo'         => 'Laravel ' . app()::VERSION . ' - MyFatoorah Package ' . MYFATOORAH_LARAVEL_PACKAGE_VERSION,
+            'UserDefinedField'           =>'subscribtion' 
         ];
     }
 
@@ -215,10 +246,43 @@ class MyFatoorahController extends Controller
                     $this->balanceService->increase((double) $data->InvoiceValue);
                     DB::commit();
                     // return $response;
-                    if ($transaction->donation->registration_method == 'reception') {
+                    if ($transaction->donation->registeration_method == 'reception') {
                         return to_route('reception.donations.show', $transaction->donation->id)->with('success', 'payment done successfully!');
                     } else {
+                       return to_route('donation.sheet',$transaction->PaymentId);
                        
+                    }
+                }
+                // return $response;
+            
+            }elseif($data->UserDefinedField == 'subscribtion'){
+                // save the transaction
+                if ($data->InvoiceStatus == "Paid") {
+                    DB::beginTransaction();
+                    $subscriber = Subscriber::findOrFail($data->CustomerReference);
+                   $subscriber->paid=true;
+                   $subscriber->save();
+                    // save the Transaction
+                    $transaction  = Transaction::create([
+                        'subsciber_id'=>$subscriber->id,
+                        'InvoiceId' => $data->InvoiceId,
+                        'InvoiceReference' => $data->InvoiceReference,
+                        'InvoiceValue' => (float) $data->InvoiceValue,
+                        'Currency' => $data->InvoiceTransactions[0]->PaidCurrency,
+                        'CustomerName' => $data->CustomerName,
+                        'CustomerMobile' => $data->CustomerMobile,
+                        'PaymentGateway' => $data->InvoiceTransactions[0]->PaymentGateway,
+                        'PaymentId' => $data->InvoiceTransactions[0]->PaymentId,
+                        'CardNumber' => str_repeat("x", strlen($data->InvoiceTransactions[0]->CardNumber) - 4) . substr($data->InvoiceTransactions[0]->CardNumber, -4),
+                    ]);
+                    $this->balanceService->increase((double) $data->InvoiceValue);
+                    DB::commit();
+                    // return $response;
+
+                    if ($transaction->subscriber->registeration_method == 'reception') {
+                        return to_route('reception.subscriber', $transaction->subscriber->id)->with('success', 'payment done successfully!');
+                    } else {
+                       return to_route('subscriber.sheet',$subscriber->subscribtion_id);
                     }
                 }
                 // return $response;
@@ -302,6 +366,37 @@ class MyFatoorahController extends Controller
                 $jsDomain  = ($isTest) ? $countries[$vcCode]['testPortal'] : $countries[$vcCode]['portal'];
 
                 return view('myfatoorah.checkout', compact('mfSession', 'paymentMethods', 'jsDomain', 'userDefinedField'));
+            
+            }elseif(request()->filled('ssid')){
+                $orderId = request('ssid');
+                
+                $order   = $this->getSubscriberData($orderId);
+               
+                //You can replace this variable with customer Id in your system
+                $customerId = $order['national_id'];
+
+                //You can use the user defined field if you want to save card
+                $userDefinedField = config('myfatoorah.save_card') && $customerId ? "CK-$customerId" : '';
+
+                //Get the enabled gateways at your MyFatoorah acount to be displayed on checkout page
+                $mfObj          = new MyFatoorahPaymentEmbedded($this->mfConfig);
+                $paymentMethods = $mfObj->getCheckoutGateways($order['total'], $order['currency'], config('myfatoorah.register_apple_pay'));
+
+                if (empty($paymentMethods['all'])) {
+                    throw new Exception('noPaymentGateways');
+                }
+
+                //Generate MyFatoorah session for embedded payment
+                $mfSession = $mfObj->getEmbeddedSession($userDefinedField);
+
+                //Get Environment url
+                $isTest = $this->mfConfig['isTest'];
+                $vcCode = $this->mfConfig['countryCode'];
+
+                $countries = MyFatoorah::getMFCountries();
+                $jsDomain  = ($isTest) ? $countries[$vcCode]['testPortal'] : $countries[$vcCode]['portal'];
+
+                return view('myfatoorah.checkout', compact('mfSession', 'paymentMethods', 'jsDomain', 'userDefinedField'));
             }
         } catch (Exception $ex) {
             $exMessage = __('myfatoorah.' . $ex->getMessage());
@@ -314,6 +409,7 @@ class MyFatoorahController extends Controller
 
 
     //-----------------------------------------------------------------------------------------------------------------------------------------
+    // appointment
     private function getTestOrderData($orderId)
     {
         $appointment = Appointment::findOrFail($orderId);
@@ -332,6 +428,7 @@ class MyFatoorahController extends Controller
         
       
     }
+    // donation
     private function getDonationData($orderId){
         $donation =Donation::findOrFail($orderId);
        
@@ -342,6 +439,20 @@ class MyFatoorahController extends Controller
             'total'    => (double) $donation->value,
             'currency' => config('app.currency', 'EGP'),
             'type'=>'donation'
+
+        ];
+    }
+    // subscriber
+    private function getSubscriberData($orderId){
+        $subscriber =Subscriber::findOrFail($orderId)->load(['patient','plan']);
+       
+        return [
+            'name' => $subscriber->patient->name,
+            'phone' => $subscriber->patient->phone,
+            'national_id' => $subscriber->patient->national_id,
+            'total'    => (double) $subscriber->plan->price,
+            'currency' => config('app.currency', 'EGP'),
+            'type'=>'subscibtion'
 
         ];
     }
