@@ -100,4 +100,8 @@ class PlanController extends Controller
         $plan->delete();
         return to_route('plans.index')->with('success',"plan $id deleted succesfully!");
     }
+    public function subscribers($id) {
+        $plan=Plan::findOrFail($id);
+        return view('admin.plans.subscribers',compact('plan'));
+    }
 }

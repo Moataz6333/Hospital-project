@@ -93,6 +93,12 @@
                                 Plans
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="{{route('reception.events')}}">
+                                <span data-feather="award"></span>
+                                Events
+                            </a>
+                        </li>
 
                     </ul>
                     <hr>

@@ -34,7 +34,7 @@
             </div>
             <div class="card-footer">
                 <div class="d-flex w-100 justify-content-between align-items-end">
-                     <a href="" class="btn btn-success">subscribers(0)</a>
+                     <a href="{{route('subscribers.index',$plan->id)}}" class="btn btn-success">subscribers({{count($plan->subscribers)}})</a>
                      <a href="{{route('plans.show',$plan->id)}}" class="btn btn-primary justify-self-end">show</a>
                 
                     </div>

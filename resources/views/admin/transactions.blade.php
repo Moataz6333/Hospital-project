@@ -53,10 +53,15 @@
                     </td>
                     <td>
                         @if ($transaction->donation)
-                            donation
-                        @else
-                            appointment
-                        @endif
+                                  <b>  <span class="text-success">donation</span> </b>
+                                @else
+                                    @if ($transaction->subscriber)
+                                    <b> <span class="text-primary">subscriber</span>  </b>   
+                                    @else
+                                    <b>  <span class="text-dark">appointment</span>   </b>
+                                    @endif
+                                    
+                                @endif
                     </td>
 
                 </tr>

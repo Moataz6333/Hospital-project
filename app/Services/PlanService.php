@@ -2,7 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\Follower;
+use App\Models\Hospital;
 use App\Models\Patient;
+use App\Models\Plan;
 use App\Models\Subscriber;
 use Illuminate\Support\Facades\DB;
 
@@ -29,6 +32,7 @@ class PlanService
             $subsecriber->payment_method = 'cash';
             if (array_key_exists('paid',$data)) {
                 $subsecriber->paid =true;
+                Hospital::first()->increaseBalance($plan->price);
             }
             $subsecriber->save();
             return $subsecriber;
@@ -79,8 +83,10 @@ class PlanService
             $subsecriber->payment_method = 'cash';
             if (array_key_exists('paid',$data)) {
                 $subsecriber->paid =true;
+                Hospital::first()->increaseBalance($subsecriber->plan->price);
             }else {
                 $subsecriber->paid =false;
+                Hospital::first()->decreaseBalance($subsecriber->plan->price);
             }
             $subsecriber->save();
             return $subsecriber;
@@ -99,6 +105,23 @@ class PlanService
         ->limit(1)
         ->pluck('plan_id')
         ->first();
-        return $most;
+        if ($most) {
+            return $most;
+        } else {
+            return  Plan::first()->id;
+        }
+        
+       
+    }
+    public function follow($email,$event_id)  {
+        if (! Follower::where('email',$email)->where('eventt_id',$event_id)->first()) {
+          $follower=  Follower::create([
+                'email'=>$email,
+                'eventt_id'=>$event_id
+            ]);
+            return $follower;
+        }else {
+            return false;
+        }
     }
 }

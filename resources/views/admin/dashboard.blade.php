@@ -25,6 +25,10 @@
                     <h3>Donations : <span id="donations" class="text-secondary">{{ $balance['donations'] }}</span>
                         {{ config('app.currency') }}</h3>
                 </li>
+                <li>
+                    <h3>Subscribers : <span id="subscribers" class="text-secondary">{{ $balance['subscribers'] }}</span>
+                        {{ config('app.currency') }}</h3>
+                </li>
             </ul>
         </div>
         <div class="col-3">
@@ -84,9 +88,14 @@
                             </td>
                             <td>
                                 @if ($transaction->donation)
-                                    donation
+                                  <b>  <span class="text-success">donation</span> </b>
                                 @else
-                                    appointment
+                                    @if ($transaction->subscriber)
+                                    <b> <span class="text-primary">subscriber</span>  </b>   
+                                    @else
+                                    <b>  <span class="text-dark">appointment</span>   </b>
+                                    @endif
+                                    
                                 @endif
                             </td>
 
@@ -208,21 +217,24 @@
 
         var ctx = document.getElementById('myChart');
         var pie = [+document.getElementById('cash').textContent, +document.getElementById('transactions').textContent, +
-            document.getElementById('donations').textContent
+            document.getElementById('donations').textContent,
+            + document.getElementById('subscribers').textContent
         ];
         const pieData = {
             labels: [
                 'Cash',
                 'Transaction',
-                'Donation'
+                'Donation',
+                'subscribers'
             ],
             datasets: [{
-                label: 'My First Dataset',
+                label: 'sum',
                 data: pie,
                 backgroundColor: [
                     'rgb(255, 99, 132)',
                     'rgb(54, 162, 235)',
-                    'rgb(255, 205, 86)'
+                    'rgb(255, 205, 86)',
+                    '#27960e'
                 ],
                 hoverOffset: 4
             }]

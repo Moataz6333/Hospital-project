@@ -9,6 +9,7 @@ use App\Http\Controllers\ClinicController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\EmpController;
+use App\Http\Controllers\EventtController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ReciptionController;
 use App\Http\Controllers\ReportController;
@@ -51,6 +52,8 @@ Route::middleware(['auth:sanctum', 'admin_only'])->group(function () {
     Route::get('/transactions', [DashboardController::class,'transactions'])->name('transactions.index');
     Route::get('/reports',[ReportController::class,'index'])->name('reports.index');
     Route::resource('/plans', PlanController::class);
+    Route::get('/subscribers/{id}', [PlanController::class,'subscribers'])->name('subscribers.index');
+    Route::resource('/events', EventtController::class);
 });
 
 // reciptionist
@@ -80,7 +83,9 @@ Route::middleware(['auth:sanctum', 'receptionist_only'])->group(function () {
     Route::get('/reception/subscribers/edit/{id}', [ReciptionController::class,'subscriber'])->name('reception.subscriber');
     Route::post('/reception/subscribers/edit/{id}', [ReciptionController::class,'updateSubscriber'])->name('reception.subscriber.update');
     Route::delete('/reception/subscriber/delete/{id}',[ReciptionController::class,'destroySubscriber'])->name('reception.subscriber.destroy');
-
+    Route::get('/reception/events', [ReciptionController::class,'events'])->name('reception.events');
+    Route::get('/reception/event/register/{id}', [ReciptionController::class,'event_register_view'])->name('reception.event.show');
+    Route::post('/reception/event/register/{id}', [ReciptionController::class,'event_register'])->name('reception.event.register');
 
     // Route::get('/test',[ReciptionController::class,'test']);
 });
@@ -110,6 +115,3 @@ Route::get('/subscribers/export/{id}', [HospitalController::class,'exportSubscri
 Route::get('/donation/sheet/{id}', [DonationController::class,'sheet'])->name('donation.sheet');
 Route::get('/donation/export/{id}', [DonationController::class,'export'])->name('donation.export');
 
-Route::get('/test/{amount}', function ($amount) {
-   
-});

@@ -67,11 +67,11 @@
                         {{-- hsopital --}}
                         <li class="nav-item">
                             <a class="nav-link @if(Route::is('hospital') ) active @endif "  data-bs-toggle="collapse" href="#hospital" role="button"
-                                aria-expanded="false" aria-controls="hospital">
+                                aria-expanded="@if(Route::is('hospital') ) true @else false @endif" aria-controls="hospital">
                                 <span data-feather="home"></span>
                                 Hospital
                             </a>
-                            <div class="collapse" id="hospital">
+                            <div class="collapse @if(Route::is('hospital') ) show @endif" id="hospital">
                                 <ul class="nav flex-column ">
                                     <li class="nav-item ms-2">
                                         <a class="nav-link" href="{{ route('hospital') }}">
@@ -84,12 +84,12 @@
                         </li>
                         {{-- plans --}}
                         <li class="nav-item">
-                            <a class="nav-link @if(Route::is('plans.index') || Route::is('plans.create') ) active @endif "  data-bs-toggle="collapse" href="#plans" role="button"
-                                aria-expanded="false" aria-controls="plans">
+                            <a class="nav-link @if(Route::is('plans.index') || Route::is('plans.create') || Route::is('plans.show') || Route::is('subscribers.index') ) active @endif "  data-bs-toggle="collapse" href="#plans" role="button"
+                                aria-expanded="@if(Route::is('plans.index') || Route::is('plans.create') || Route::is('plans.show') || Route::is('subscribers.index') ) true @else false @endif" aria-controls="plans">
                                 <span data-feather="shopping-cart"></span>
                                 Plans
                             </a>
-                            <div class="collapse" id="plans">
+                            <div class="collapse @if(Route::is('plans.index') || Route::is('plans.create') || Route::is('plans.show') || Route::is('subscribers.index') ) show @endif" id="plans">
                                 <ul class="nav flex-column ">
                                     <li class="nav-item ms-2">
                                         <a class="nav-link" href="{{ route('plans.index') }}">
@@ -105,6 +105,29 @@
                                 </ul>
                             </div>
                         </li>
+                        {{-- events --}}
+                        <li class="nav-item">
+                            <a class="nav-link @if(Route::is('events.index') || Route::is('events.create') || Route::is('events.edit') ) active @endif "  data-bs-toggle="collapse" href="#events" role="button"
+                                aria-expanded="@if(Route::is('events.index') || Route::is('events.create') || Route::is('events.edit') ) true @else false @endif" aria-controls="events">
+                                <span data-feather="award"></span>
+                                Events
+                            </a>
+                            <div class="collapse @if(Route::is('events.index') || Route::is('events.create') || Route::is('events.edit') ) show @endif" id="events">
+                                <ul class="nav flex-column ">
+                                    <li class="nav-item ms-2">
+                                        <a class="nav-link" href="{{ route('events.index') }}">
+                                            <span data-feather="hash"></span>
+                                           all Events
+                                        </a>
+                                    </li>
+                                        <a class="nav-link ms-2" href="{{ route('events.create') }}">
+                                            <span data-feather="user-plus"></span>
+                                           add Event
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
                         {{-- clinics --}}
                         <li class="nav-item">
                             <a class="nav-link @if(Route::is('clinics.index') ||Route::is('clinics.edit') ) active @endif " href="{{ route('clinics.index') }}">
@@ -115,11 +138,11 @@
                        {{-- doctors --}}
                         <li class="nav-item">
                             <a class="nav-link @if(Route::is('doctors.index') ||Route::is('doctors.create') ||Route::is('doctors.edit')  ||Route::is('doctors.timeTable')  ||Route::is('doctors.archive') ) active @endif" data-bs-toggle="collapse" href="#doctors" role="button"
-                                aria-expanded="false" aria-controls="doctors">
+                                aria-expanded="@if(Route::is('doctors.index') ||Route::is('doctors.create') ||Route::is('doctors.edit')  ||Route::is('doctors.timeTable')  ||Route::is('doctors.archive') ) true @else false @endif" aria-controls="doctors">
                                 <span data-feather="user"></span>
                                 Doctors
                             </a>
-                            <div class="collapse" id="doctors">
+                            <div class="collapse @if(Route::is('doctors.index') ||Route::is('doctors.create') ||Route::is('doctors.edit')  ||Route::is('doctors.timeTable')  ||Route::is('doctors.archive') ) show @endif" id="doctors">
                                 <ul class="nav flex-column ">
                                     <li class="nav-item ms-2">
                                         <a class="nav-link" href="{{ route('doctors.index') }}">
@@ -139,11 +162,11 @@
                         {{-- employees --}}
                         <li class="nav-item">
                             <a class="nav-link @if(Route::is('employees.index') ||Route::is('employees.show') ||Route::is('employees.create') ||Route::is('employees.salaries') ) active @endif" data-bs-toggle="collapse" href="#emps" role="button"
-                                aria-expanded="false" aria-controls="doctors">
+                                aria-expanded="@if(Route::is('employees.index') ||Route::is('employees.show') ||Route::is('employees.create') ||Route::is('employees.salaries') ) true @else false @endif" aria-controls="doctors">
                                 <span data-feather="users"></span>
                                 Employees
                             </a>
-                            <div class="collapse" id="emps">
+                            <div class="collapse @if(Route::is('employees.index') ||Route::is('employees.show') ||Route::is('employees.create') ||Route::is('employees.salaries') ) show @endif" id="emps">
                                 <ul class="nav flex-column ">
                                     <li class="nav-item ms-2">
                                         <a class="nav-link" href="{{ route('employees.index') }}">

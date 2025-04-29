@@ -29,6 +29,7 @@
                     <div class="col d-flex align-items-center justify-content-center">
                         <i class="{{$plan->icon}}"></i>
                     </div>
+                    <h6 class="h6">Price: {{$plan->price}} {{config('app.currency')}} </h6>
                 </div>
                 
             </div>

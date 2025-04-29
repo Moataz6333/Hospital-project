@@ -25,4 +25,10 @@ Route::get('/plans',[HospitalController::class,'plans'] );
 Route::get('/plan/{id}',[HospitalController::class,'plan'] );
 // subscribe to plan
 Route::post('/subscribe/{id}', [HospitalController::class,'subscribe']);
+// events
+Route::get('events',[HospitalController::class,'events']);
+// event with id
+Route::get('event/{id}',[HospitalController::class,'event']);
+// subscribe for event
+Route::post('/event/register/{id}', [HospitalController::class,'event_register']);
 

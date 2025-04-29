@@ -430,12 +430,12 @@ class MyFatoorahController extends Controller
     }
     // donation
     private function getDonationData($orderId){
-        $donation =Donation::findOrFail($orderId);
+        $donation =Donation::findOrFail($orderId)->load('patient');
        
         return [
-            'name' => $donation->name,
-            'phone' => $donation->phone,
-            'national_id' => $donation->national_id,
+            'name' => $donation->patient->name,
+            'phone' => $donation->patient->phone,
+            'national_id' => $donation->patient->national_id,
             'total'    => (double) $donation->value,
             'currency' => config('app.currency', 'EGP'),
             'type'=>'donation'

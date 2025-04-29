@@ -9,7 +9,9 @@ use App\Models\Donation;
 use App\Models\Employee;
 use App\Models\Hospital;
 use App\Models\Patient;
+use App\Models\Plan;
 use App\Models\Transaction;
+use Illuminate\Support\Facades\DB;
 
 class EGP_balanceService implements BalanceInterface
 {
@@ -17,22 +19,28 @@ class EGP_balanceService implements BalanceInterface
     public function __construct()
     {
         $this->hospital = Hospital::first();
-        // dd($this->months());
     }
 
     public function getBalance()
     {
+        $this->updateBalance();
         return [
             "cash" => $this->getCash(),
             "transactions" => $this->getTransactions(),
             "donations" => $this->getdonations()['total'],
+            "subscribers"=> $this->getSubscribtions(),
             "total" => round($this->hospital->balance)
         ];
+    }
+    // update balance
+    public function updateBalance() {
+        $this->hospital->balance =array_sum([$this->getCash(),$this->getdonations()['total'],$this->getTransactions(),$this->getSubscribtions()]);
+        $this->hospital->save();
     }
     // online trunsactions
     public function getTransactions()
     {
-        $transactions = Transaction::where('service', 'myfatoorah')->where('donation_id', null)->sum('InvoiceValue');
+        $transactions = Transaction::where('service', 'myfatoorah')->where('donation_id', null)->where('subsciber_id', null)->sum('InvoiceValue');
         $transactions *= (float) config('app.rate');
         return round($transactions);
     }
@@ -46,6 +54,15 @@ class EGP_balanceService implements BalanceInterface
             'cash' => $cash,
             'total' => $transactions + $cash
         ];
+    }
+    // subscribtions
+    public function getSubscribtions() {
+       $plans =Plan::all()->load('subscribers');
+        $total =0;
+        foreach ($plans as $plan ) {
+            $total += count($plan->subscribers) * $plan->price;
+        }
+        return $total;
     }
     public function getCash()
     {

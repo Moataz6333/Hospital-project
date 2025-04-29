@@ -8,6 +8,7 @@ use App\Http\Resources\AppointmentResource;
 use App\Http\Resources\ClinicResourse;
 use App\Http\Resources\ClinicWithDoctorsResourse;
 use App\Http\Resources\DoctorResource;
+use App\Http\Resources\EventResorce;
 use App\Http\Resources\PlanResource;
 use App\Models\Clinic;
 use App\Models\Doctor;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use App\Interfaces\PatientInterface;
 use App\Interfaces\PaymentInterface;
+use App\Models\Eventt;
 use App\Models\Plan;
 use App\Services\DonationService;
 use App\Services\PlanService;
@@ -106,7 +108,8 @@ class HospitalController extends Controller
         }
     }
     // donate
-    public function donate(Request $request) {
+    public function donate(Request $request)
+    {
         $validator =  Validator::make(
             $request->all(),
             [
@@ -124,19 +127,19 @@ class HospitalController extends Controller
                 'errors' => $validator->errors(),  // Return validation errors
             ], 422);
         }
-        $donationService =new DonationService();
-        $donation =$donationService->registerOnline($validator->validated(),'online');
-         return $this->paymentService->donate($donation);
-
+        $donationService = new DonationService();
+        $donation = $donationService->registerOnline($validator->validated(), 'online');
+        return $this->paymentService->donate($donation);
     }
     // has a discount
-    public function hasDiscount(Request $request) {
+    public function hasDiscount(Request $request)
+    {
         $validator =  Validator::make(
             $request->all(),
             [
                 'national_id' => ['required'],
                 'doctor_id' => ['required'],
-              
+
             ]
         );
         if ($validator->fails()) {
@@ -145,57 +148,86 @@ class HospitalController extends Controller
                 'errors' => $validator->errors(),  // Return validation errors
             ], 422);
         }
-        $national_id =$request->national_id;
-        $doctor_id=$request->doctor_id;
-        $patient =Patient::where('national_id',$national_id)->first();
-        $doctor =Doctor::findOrFail($doctor_id);
-        if($patient){
-        $appointments = count($patient->appointments->where('doctor_id',$doctor->id));
-        $discounts =Discount::all();
-        $patient_discount=0;
-        $discount_name="";
-        foreach ($discounts as $discount) {
-            if (str_contains($discount->name,'Appointments')) {
-                $number = (int) explode('-',$discount->name)[0];
-                if($appointments >= $number){
-                    $patient_discount=$discount->discount;
-                    $discount_name =$discount->name;
+        $national_id = $request->national_id;
+        $doctor_id = $request->doctor_id;
+        $patient = Patient::where('national_id', $national_id)->first();
+        $doctor = Doctor::findOrFail($doctor_id);
+        if ($patient) {
+            $appointments = count($patient->appointments->where('doctor_id', $doctor->id));
+            $discounts = Discount::all();
+            $patient_discount = 0;
+            $discount_name = "";
+            foreach ($discounts as $discount) {
+                if (str_contains($discount->name, 'Appointments')) {
+                    $number = (int) explode('-', $discount->name)[0];
+                    if ($appointments >= $number) {
+                        $patient_discount = $discount->discount;
+                        $discount_name = $discount->name;
+                    }
                 }
             }
-        }
-        if ($patient->donation) {
-            $patient_discount=Discount::where('name','donator')->first()->discount;
-            $discount_name ='Donator';
-        }
-        if ($patient_discount) {
-            $price = $doctor->price - ($patient_discount*$doctor->price);
-            $data=[
-                'status'=>'found',
-                'message'=>"this patient has a $discount_name discount",
-                'price'=>$price
-            ];
-            return response()->json($data,200);
-        }
-        return response()->json(['status'=>'not-found',],200);
-
-        }else{
-        return response()->json(['status'=>'not-found',],200);
-           
+            if ($patient->donation) {
+                $patient_discount = Discount::where('name', 'donator')->first()->discount;
+                $discount_name = 'Donator';
+            }
+            if ($patient_discount) {
+                $price = $doctor->price - ($patient_discount * $doctor->price);
+                $data = [
+                    'status' => 'found',
+                    'message' => "this patient has a $discount_name discount",
+                    'price' => $price
+                ];
+                return response()->json($data, 200);
+            }
+            return response()->json(['status' => 'not-found',], 200);
+        } else {
+            return response()->json(['status' => 'not-found',], 200);
         }
     }
     // plans
-    public function plans() {
-        return response()->json(PlanResource::collection(Plan::all()),200);
+    public function plans()
+    {
+        return response()->json(PlanResource::collection(Plan::all()), 200);
     }
     // plan
-    public function plan($id) {
+    public function plan($id)
+    {
         $plan = Plan::findOrfail($id);
         return response()->json(new PlanResource($plan), 200);
     }
     // subscriber
-    public function subscribe(PlanSubscriptionRequest $request,$id) {
-        $plan=Plan::findOrFail($id);
-        $subscriber =$this->planService->register_online($request->validated(),$plan);
-      return $this->paymentService->subscribe($subscriber);
+    public function subscribe(PlanSubscriptionRequest $request, $id)
+    {
+        $plan = Plan::findOrFail($id);
+        $subscriber = $this->planService->register_online($request->validated(), $plan);
+        return $this->paymentService->subscribe($subscriber);
     }
+    // events
+    public function events() {
+        return response()->json(EventResorce::collection(Eventt::all()), 200);
+    }
+    // event
+    public function event($id) {
+        $event = Eventt::findOrfail($id);
+        return response()->json(new EventResorce($event), 200);
+    }
+    //follow event
+    public function event_register(Request $request, $id)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+        $follower = $this->planService->follow($request->email, $id);
+        if ($follower) {
+            return response()->json([
+                "message"=>"follower registered successfully",
+                "follower"=>$follower
+            ], 200);
+        } else {
+            return response()->json([
+                "message"=>"Email Already Exists with this event!"
+            ], 200);
+        }
+    }
+
 }

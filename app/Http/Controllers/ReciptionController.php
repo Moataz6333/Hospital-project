@@ -13,6 +13,7 @@ use Illuminate\Validation\Rule;
 use App\Interfaces\PatientInterface;
 use App\Interfaces\PaymentInterface;
 use App\Models\Discount;
+use App\Models\Eventt;
 use App\Models\Patient;
 use App\Models\Plan;
 use App\Models\Subscriber;
@@ -324,7 +325,25 @@ class ReciptionController extends Controller
         return to_route('reception.subscribers',$plan_id)->with('success','subscriber deleted successfully');
         
     }
-  
+    public function events() {
+        return view('reciption.events.index',['events'=>Eventt::all()]);
+    }
+    public function event_register_view($id) {
+        $event =Eventt::findOrFail($id);
+        return view('reciption.events.show',compact('event'));
+    }
+    public function event_register(Request $request,$id) {
+       $request->validate([
+        'email'=>'required|email',
+       ]);
+       $follower=$this->planService->follow($request->email,$id);
+       if ($follower) {
+        return redirect()->back()->with('success','Registeration Done Successfully!');
+       } else {
+        return redirect()->back()->with('faild','Email Already Exists');
+       }
+       
+    }
  
    
 }
