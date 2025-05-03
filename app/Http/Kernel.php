@@ -68,5 +68,6 @@ class Kernel extends HttpKernel
         'receptionist_only' => \App\Http\Middleware\ReceptionMiddleware::class,
         'doctor_only' => \App\Http\Middleware\DoctorMiddleware::class,
         'superAdmin_only' => \App\Http\Middleware\SuperAdminMiddleWare::class,
+        'call-centers-only' => \App\Http\Middleware\CallCenterMiddleware::class,
     ];
 }

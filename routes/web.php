@@ -5,6 +5,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HospitalController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CallCenterController;
 use App\Http\Controllers\ClinicController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\DonationController;
@@ -102,6 +103,13 @@ Route::middleware(['auth:sanctum', 'doctor_only'])->group(function () {
 // superAdmin routes
 Route::middleware(['auth:sanctum', 'superAdmin_only'])->group(function () {
     Route::resource('roles', RoleController::class); 
+});
+// call-centers routes
+Route::middleware(['auth:sanctum', 'call-centers-only'])->group(function () {
+    Route::get('/call-center', [CallCenterController::class,'index'])->name('centers.index');
+    Route::get('/chat/{id}', [CallCenterController::class,'chat'])->name('centers.chat');
+    Route::post('/send', [CallCenterController::class,'send'])->name('centers.send');
+    Route::delete('/chat/{id}', [CallCenterController::class,'destroy'])->name('chat.destroy');
 });
 
 // hosptial

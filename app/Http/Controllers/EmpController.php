@@ -22,7 +22,7 @@ class EmpController extends Controller
      */
     public function index()
     {
-        return view('employees.index', ['employees' => Employee::all()->load('user')]);
+        return view('employees.index', ['employees' => Employee::all()->reverse()->load('user')]);
     }
 
     /**
@@ -30,8 +30,8 @@ class EmpController extends Controller
      */
     public function create()
     {
-
-        return view('employees.create');
+            $roles=Role::all();
+        return view('employees.create',compact('roles'));
     }
 
 

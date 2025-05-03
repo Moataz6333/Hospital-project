@@ -27,8 +27,11 @@ class UserController extends Controller
                      else if(auth()->user()->role == 'doctor'){
                         return to_route('doctor.index');
                     }
+                     else if(auth()->user()->role == 'call-center'){
+                        return to_route('centers.index');
+                    }
         }
-        return redirect()->back()->withErrors(['email'=>'invaild email'])->withInput();
+        return redirect()->back()->withErrors(['email'=>'invaild email or password'])->withInput();
  
     }
    

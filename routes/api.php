@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\HospitalController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -32,3 +33,10 @@ Route::get('event/{id}',[HospitalController::class,'event']);
 // subscribe for event
 Route::post('/event/register/{id}', [HospitalController::class,'event_register']);
 
+// chat part
+// request for chat
+Route::post('/request/chat', [ChatController::class,'requestForChat']);
+// get chat
+Route::get('/chat/{id}',[ChatController::class,'chat'] );
+// send message
+Route::post('/send', [ChatController::class,'send']);

@@ -38,14 +38,16 @@
                 @enderror
                 <select class="form-select" name="role">
                     <option disabled selected>role</option>
-               @can('isSuperAdmin')
-                   
-               <option value="super_admin">Super Admin</option> 
-               <option value="admin">Admin</option> 
-               @endcan   
-                    <option value="receptionist">Receptionist</option>
-                    <option value="nurse">Nurse</option>
-                    <option value="security">Security</option>
+                        @foreach ($roles as $role)
+                        @if ($role->name == 'super_admin' ||$role->name == 'admin' )
+                        {{-- authorize --}}
+                        @can('isSuperAdmin')
+                        <option value="{{$role->name}}">{{ucfirst($role->name)}} </option>
+                        @endcan
+                        @else
+                        <option value="{{$role->name}}">{{ucfirst($role->name)}} </option>
+                        @endif
+                        @endforeach
                 </select>
             </div>
         </div>
