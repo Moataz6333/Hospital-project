@@ -22,7 +22,7 @@ class NewChatEvent implements ShouldBroadcastNow
     public $chat;
     public function __construct(Chat $chat)
     {
-        $this->chat=$chat;
+        $this->chat = $chat;
     }
 
     /**
@@ -33,10 +33,11 @@ class NewChatEvent implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
-            new Channel('new-chat'),
+            new Channel('new-chat'.$this->chat->user_id),
         ];
     }
-    public function broadcastAs() {
+    public function broadcastAs()
+    {
         return 'new.chat';
     }
 }

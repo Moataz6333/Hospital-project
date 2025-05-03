@@ -33,7 +33,7 @@ class MessageSendedEvent implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
-            new Channel('message-sended'),
+            new Channel('message-sended'.$this->message->chat->id),
         ];
     }
     public function broadcastAs()

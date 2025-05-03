@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\Message;
 use App\Models\Chat;
 use App\Models\Sender;
+use App\Models\User;
 
 class ChatController extends Controller
 {
@@ -18,18 +19,26 @@ class ChatController extends Controller
         $request->validate([
             'name' => "required|min:2|max:255",
         ]);
-        $sender = Sender::create([
-            'name' => $request->name
-        ]);
+        $users = User::where('role', 'call-center')->where('isActive', true)->pluck('id')->toArray();
+        if (count($users) != 0) {
+            $user =  $users[array_rand($users)];
+            $sender = Sender::create([
+                'name' => $request->name
+            ]);
 
-        $chat = Chat::create([
-            'uuid' => uuid_create(UUID_TYPE_DEFAULT),
-            'sender_id' => $sender->id,
-            'user_id' => 21,
-        ]);
-        return response()->json([
-            "chat" => $chat->load(['messages', 'sender'])
-        ], 200);
+            $chat = Chat::create([
+                'uuid' => uuid_create(UUID_TYPE_DEFAULT),
+                'sender_id' => $sender->id,
+                'user_id' => $user,
+            ]);
+            return response()->json([
+                "chat" => $chat->load(['messages', 'sender'])
+            ], 200);
+        } else {
+            return response()->json([
+                "message" => "There are no Call-Centers available now, Try to contact later!"
+            ], 200);
+        }
     }
     public function chat($id)
     {

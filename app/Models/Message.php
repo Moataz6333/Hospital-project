@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Chat;
 
 class Message extends Model
 {
@@ -15,4 +16,7 @@ class Message extends Model
         'receiver_id',
         'sendedBy',
     ];
+    public function chat() {
+        return $this->belongsTo(Chat::class);
+    }
 }

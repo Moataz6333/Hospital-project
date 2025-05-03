@@ -20,9 +20,9 @@ Broadcast::channel('private-doctor.{doctorId}', function ($user, $doctorId) {
 Broadcast::channel('private-balanceUpdated', function ($user) {
     return true;
 });
-Broadcast::channel('message-sended', function ($user) {
+Broadcast::channel('message-sended.{chatId}', function ($user,$chatId) {
     return true;
 });
-Broadcast::channel('new-chat', function ($user) {
-    return true;
+Broadcast::channel('new-chat.{userId}', function ($user,$userId) {
+    return (int) $user->id === (int) $userId;
 });

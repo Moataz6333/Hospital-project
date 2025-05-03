@@ -74,7 +74,7 @@
                     <div class="p-2 border-bottom">
                         <h5 class="h5"> <i class="fa-solid fa-headset"></i> Chats</h5>
                     </div>
-                    <ul id="chatsNav" class="nav flex-column list-group">
+                    <ul id="chatsNav" class="nav flex-column-reverse list-group">
                         @foreach ($chats as $chat)
                             <li
                                 class="list-group-item list-group-item-action @if (request()->route('id') == $chat->uuid) bg-dark-subtle @endif border-bottom d-flex flex-column justify-content-center align-items-center ">
@@ -145,8 +145,8 @@
         document.addEventListener("DOMContentLoaded", function() {
 
             Pusher.logToConsole = false;
-
-            window.Echo.channel('new-chat')
+                var userId= {{auth()->user()->id}} ;
+            window.Echo.channel(`new-chat${userId}`)
                 .listen('.new.chat', (data) => {
                     let lastMessage = "";
                     let lastDate = "";
@@ -154,11 +154,12 @@
                         lastMessage = data.chat.messages[0].message;
                         lastDate = timeAgo(data.chat.messages[0].created_at);
                     }
+                        
 
                     $('#chatsNav').append(`
                             <li
                                 class="list-group-item list-group-item-action  border-bottom d-flex flex-column justify-content-center align-items-center ">
-                                <a href="\chat\ ${data.chat.uuid}" }}" class="nav-link">
+                                <a href="chat/${data.chat.uuid}" }}" class="nav-link">
                                     <div class="row w-100 p-2 m-0">
                                         {{-- image --}}
                                         <div class="col-3">

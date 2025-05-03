@@ -14,8 +14,6 @@ use Illuminate\Support\Facades\Auth;
 class UserController extends Controller
 {
     public function login(){
-       
- 
         if(auth()->attempt(request()->only(['email','password']),
         request()->filled('remember'))){
                     if(auth()->user()->role == 'admin' || auth()->user()->role == 'super_admin'){
@@ -28,6 +26,9 @@ class UserController extends Controller
                         return to_route('doctor.index');
                     }
                      else if(auth()->user()->role == 'call-center'){
+                            auth()->user()->update([
+                                'isActive'=>true,
+                            ]);
                         return to_route('centers.index');
                     }
         }
@@ -66,11 +67,15 @@ class UserController extends Controller
     }
 
     public function logout(Request $request): RedirectResponse{
+        auth()->user()->update([
+            'isActive'=>false,
+        ]);
         Auth::guard('web')->logout();
  
         $request->session()->invalidate();
      
         $request->session()->regenerateToken();
+       
      
         return redirect('/login');
     }
