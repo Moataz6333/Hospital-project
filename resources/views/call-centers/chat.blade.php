@@ -260,7 +260,7 @@
                     $('#chatsNav').append(`
                 <li
                     class="list-group-item list-group-item-action  border-bottom d-flex flex-column justify-content-center align-items-center ">
-                    <a href="chat/${data.chat.uuid}" }}" class="nav-link">
+                    <a href="/chat/${data.chat.uuid}" }}" class="nav-link">
                         <div class="row w-100 p-2 m-0">
                             {{-- image --}}
                             <div class="col-3">
