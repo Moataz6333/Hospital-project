@@ -19,7 +19,8 @@ class ChatController extends Controller
         $request->validate([
             'name' => "required|min:2|max:255",
         ]);
-        $users = User::where('role', 'call-center')->where('isActive', true)->pluck('id')->toArray();
+        // $users = User::where('role', 'call-center')->where('isActive', true)->pluck('id')->toArray();
+          $users=[21];
         if (count($users) != 0) {
             $user =  $users[array_rand($users)];
             $sender = Sender::create([
