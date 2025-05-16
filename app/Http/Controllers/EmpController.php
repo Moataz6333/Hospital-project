@@ -252,4 +252,5 @@ class EmpController extends Controller
         $doctors=DB::table('doctors')->count();
         return view('employees.salaries',compact('total','counts','doctors','doctors_salary'));
     }
+    
 }

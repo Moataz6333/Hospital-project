@@ -121,10 +121,10 @@
             <main class="col-md-8 ms-sm-auto  px-md-4" style="height: 90vh;">
                 <div class="w-100 mt-2 h-100 d-flex justify-content-end align-items-end flex-column">
                     {{-- header --}}
-                    <div class="chat-header bg-dark bg-gradient rounded-top w-100" style="height: 10vh">
+                    <div class="chat-header bg-dark bg-gradient rounded-top w-100 d-flex justify-content-center" >
                         <div class="p-2 row w-100">
                             {{-- image --}}
-                            <div class="col-1 " style="border-radius: 50%; overflow:hidden;">
+                            <div class="col-1 p-0 " style="border-radius: 50%; overflow:hidden;">
                                 <img src="{{ asset('storage/profile.jfif') }}"
                                     class="w-100 h-100 rounded-circle border border-2 border-white" alt="user">
                             </div>
